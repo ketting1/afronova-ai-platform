@@ -1,1 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 1 - What is AI?</title>
 
+    <style>
+        /* ---------- SAME STYLE AS YOUR MAIN PAGE ---------- */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: rgb(11, 14, 26);
+            color: rgb(240, 244, 255);
+            min-height: 100vh;
+            padding: 1.5rem 1rem 0;
+            overflow-x: hidden;
+        }
+
+        [id="starfield"] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            display: block;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* ---------- BACK BUTTON ---------- */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(167, 139, 250);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .back-button:hover {
+            color: rgb(196, 181, 253);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        /* ---------- LESSON CONTENT ---------- */
+        .lesson-content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 3rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 3rem;
+        }
+
+        .lesson-content h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content .subtitle {
+            color: rgb(148, 163, 184);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1.5rem;
+        }
+
+        .lesson-content h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: rgb(238, 242, 255);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgb(196, 181, 253);
+            margin-top: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-content p {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content ul {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-content .highlight-box {
+            background: rgba(167, 139, 250, 0.06);
+            border-left: 4px solid rgb(167, 139, 250);
+            padding: 1.2rem 1.8rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .lesson-content .highlight-box strong {
+            color: rgb(196, 181, 253);
+        }
+
+        .lesson-content .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgb(203, 213, 225);
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 1.5rem 0;
+        }
+
+        .lesson-content .code-block .comment {
+            color: rgb(100, 116, 139);
+        }
+
+        .lesson-content .code-block .keyword {
+            color: rgb(167, 139, 250);
+        }
+
+        .lesson-content .code-block .string {
+            color: rgb(74, 222, 128);
+        }
+
+        .lesson-content .code-block .function {
+            color: rgb(96, 165, 250);
+        }
+
+        /* ---------- RECAP CARDS ---------- */
+        .recap-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .recap-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .recap-card h4 {
+            font-size: 1.1rem;
+            color: rgb(238, 242, 255);
+            margin-bottom: 0.5rem;
+        }
+
+        .recap-card p {
+            color: rgb(148, 163, 184);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .recap-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ---------- COMPLETE BUTTON ---------- */
+        .complete-btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            background: linear-gradient(135deg, rgb(124, 58, 237), rgb(79, 70, 229));
+            color: rgb(255, 255, 255);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.3);
+            margin-top: 2rem;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(79, 70, 229, 0.5);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
+            .lesson-content {
+                padding: 2rem 1.2rem;
+            }
+
+            .lesson-content h1 {
+                font-size: 2rem;
+            }
+
+            .recap-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .recap-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- STARFIELD BACKGROUND -->
+    <canvas id="starfield"></canvas>
+
+    <div class="main-wrapper">
+
+        <!-- BACK BUTTON -->
+        <a href="index.html" class="back-button">← Back to Explorer</a>
+
+        <!-- LESSON CONTENT -->
+        <div class="lesson-content">
+
+            <h1>📘 Lesson 1: What is Artificial Intelligence?</h1>
+            <div class="subtitle">The foundation of everything we're building</div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 1: WHAT IS AI?                                   -->
+            <!-- ========================================================= -->
+            <h2>🤔 What is AI?</h2>
+            <p>
+                <strong>Artificial Intelligence (AI)</strong> is the ability of a computer or machine to <strong>think</strong> and <strong>learn</strong> like a human. 
+                Instead of just following strict rules, AI can <strong>recognise patterns</strong>, <strong>make decisions</strong>, and <strong>improve over time</strong>.
+            </p>
+
+            <div class="highlight-box">
+                <p><strong>💡 Simple definition:</strong> AI is like teaching a computer to be smart – it can see, hear, understand, and even create things!</p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 2: 3 TYPES OF AI                                -->
+            <!-- ========================================================= -->
+            <h2>📊 The 3 Types of AI</h2>
+
+            <h3>1. Narrow AI (Weak AI)</h3>
+            <p>
+                <strong>What it does:</strong> One specific task really well.<br />
+                <strong>Examples:</strong> Voice assistants (Siri, Alexa), Netflix recommendations, facial recognition, self-driving cars.<br />
+                <strong>Where we are:</strong> <em>This is where we are right now!</em>
+            </p>
+
+            <h3>2. General AI (Strong AI)</h3>
+            <p>
+                <strong>What it does:</strong> Any intellectual task that a human can do.<br />
+                <strong>Examples:</strong> A machine that can write poetry, code software, cook a meal, and have a conversation – all by itself.<br />
+                <strong>Where we are:</strong> <em>Still being researched (we're not there yet).</em>
+            </p>
+
+            <h3>3. Super AI</h3>
+            <p>
+                <strong>What it does:</strong> Smarter than the smartest human in every way.<br />
+                <strong>Examples:</strong> A machine that can solve problems humans can't even imagine.<br />
+                <strong>Where we are:</strong> <em>Science fiction (for now!).</em>
+            </p>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 3: HOW AI WORKS                                 -->
+            <!-- ========================================================= -->
+            <h2>⚙️ How Does AI Work?</h2>
+            <p>
+                AI works through <strong>Machine Learning</strong> – which is like teaching a child, but with data instead of toys.
+            </p>
+            <p><strong>The 4-step process:</strong></p>
+            <ul>
+                <li><strong>1. Data Collection:</strong> The AI is given lots of information (images, text, numbers).</li>
+                <li><strong>2. Training:</strong> The AI looks for patterns in the data.</li>
+                <li><strong>3. Testing:</strong> The AI is tested to see if it learned correctly.</li>
+                <li><strong>4. Improvement:</strong> The AI gets better over time with more data.</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>🧠 Example:</strong> To teach an AI to recognise cats, you show it 10,000 cat photos. It learns that cats have ears, whiskers, and tails. Then it can spot a cat in a new photo!</p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 4: YOUR CODING JOURNEY RECAP                    -->
+            <!-- ========================================================= -->
+            <h2>🌟 Your Coding Journey So Far</h2>
+            <p>
+                Look at everything you've already built! You didn't just learn about AI – you <strong>built</strong> something amazing.
+            </p>
+
+            <div class="recap-grid">
+
+                <div class="recap-card">
+                    <div class="icon">🎨</div>
+                    <h4>HTML Structure</h4>
+                    <p>You created the skeleton of a webpage with headings, buttons, and sections.</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">🎨</div>
+                    <h4>CSS Styling</h4>
+                    <p>You made your page beautiful with colours, gradients, rounded corners, and hover effects.</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">⭐</div>
+                    <h4>JavaScript Animation</h4>
+                    <p>You created moving stars that drift across the screen – your first animation!</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">🎯</div>
+                    <h4>Interactivity</h4>
+                    <p>You made buttons that show pop-ups when clicked – this is how apps work!</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">📱</div>
+                    <h4>Responsive Design</h4>
+                    <p>Your page looks good on phones, tablets, and laptops – that's professional!</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">🚀</div>
+                    <h4>GitHub Deployment</h4>
+                    <p>You pushed your code to GitHub and made it live on the internet – you're a real developer!</p>
+                </div>
+
+            </div>
+
+            <div class="highlight-box">
+                <p><strong>🎉 You've learned:</strong> HTML, CSS, JavaScript, Canvas animations, functions, events, responsive design, and GitHub – all in one project!</p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 5: CODE YOU'VE WRITTEN                          -->
+            <!-- ========================================================= -->
+            <h2>📝 Code You've Written</h2>
+            <p>
+                Here is a small example of the JavaScript you wrote to make the stars move:
+            </p>
+
+            <div class="code-block">
+                <span class="comment">// Your starfield code</span>
+                <br />
+                <span class="keyword">function</span> <span class="function">drawStars</span>() {
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;ctx.<span class="function">clearRect</span>(<span class="number">0</span>, <span class="number">0</span>, width, height);
+                <br />
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">for</span> (<span class="keyword">let</span> star <span class="keyword">of</span> stars) {
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.<span class="function">beginPath</span>();
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.<span class="function">arc</span>(star.x, star.y, star.radius, <span class="number">0</span>, Math.<span class="function">PI</span> * <span class="number">2</span>);
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.fillStyle = <span class="string">'rgba(255, 255, 255, '</span> + star.opacity + <span class="string">')'</span>;
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ctx.<span class="function">fill</span>();
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;star.x += star.speed * star.direction; <span class="comment">// Move sideways</span>
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;}
+                <br />
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;requestAnimationFrame(<span class="function">drawStars</span>); <span class="comment">// Keep it running</span>
+                <br />
+                }
+            </div>
+
+            <p>
+                <strong>You wrote this!</strong> Every line of it. And you understood what it does. That's massive progress!
+            </p>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 6: COMPLETE BUTTON                              -->
+            <!-- ========================================================= -->
+            <div style="text-align: center;">
+                <button class="complete-btn" onclick="completeLesson()">✅ I've Completed This Lesson</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT - Stars + Lesson Completion -->
+    <script>
+        // ---------- STARFIELD ----------
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let stars = [];
+
+        const STAR_COUNT = 200;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            createStars();
+        }
+
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.3,
+                    speed: Math.random() * 0.8 + 0.2,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    direction: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let star of stars) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + star.opacity + ')';
+                ctx.fill();
+
+                star.x += star.speed * star.direction;
+
+                if (star.x > width) {
+                    star.x = 0;
+                    star.y = Math.random() * height;
+                } else if (star.x < 0) {
+                    star.x = width;
+                    star.y = Math.random() * height;
+                }
+            }
+
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        // ---------- LESSON COMPLETION ----------
+        function completeLesson() {
+            alert('🎉 Amazing work, mate!\n\nYou\'ve just completed Lesson 1!\n\nYou now know:\n- What AI is\n- The 3 types of AI\n- How AI works\n- Everything you\'ve built so far\n\nReady for Lesson 2? 🚀');
+            // This will redirect back to the main page
+            window.location.href = 'index.html';
+        }
+
+        console.log('📘 Lesson 1 is ready!');
+    </script>
+
+</body>
+</html>
