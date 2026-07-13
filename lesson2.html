@@ -1,1 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 2 - Prompt Engineering</title>
 
+    <style>
+        /* ---------- SAME STYLE AS LESSON 1 ---------- */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: rgb(11, 14, 26);
+            color: rgb(240, 244, 255);
+            min-height: 100vh;
+            padding: 1.5rem 1rem 0;
+            overflow-x: hidden;
+        }
+
+        [id="starfield"] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            display: block;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(167, 139, 250);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .back-button:hover {
+            color: rgb(196, 181, 253);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .lesson-content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 3rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 3rem;
+        }
+
+        .lesson-content h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content .subtitle {
+            color: rgb(148, 163, 184);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1.5rem;
+        }
+
+        .lesson-content h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: rgb(238, 242, 255);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgb(196, 181, 253);
+            margin-top: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-content p {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content ul {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(167, 139, 250, 0.06);
+            border-left: 4px solid rgb(167, 139, 250);
+            padding: 1.2rem 1.8rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box strong {
+            color: rgb(196, 181, 253);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgb(203, 213, 225);
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 1.5rem 0;
+        }
+
+        .code-block .comment {
+            color: rgb(100, 116, 139);
+        }
+
+        .code-block .keyword {
+            color: rgb(167, 139, 250);
+        }
+
+        .code-block .string {
+            color: rgb(74, 222, 128);
+        }
+
+        .recap-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .recap-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .recap-card h4 {
+            font-size: 1.1rem;
+            color: rgb(238, 242, 255);
+            margin-bottom: 0.5rem;
+        }
+
+        .recap-card p {
+            color: rgb(148, 163, 184);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .recap-card .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .complete-btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            background: linear-gradient(135deg, rgb(124, 58, 237), rgb(79, 70, 229));
+            color: rgb(255, 255, 255);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.3);
+            margin-top: 2rem;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(79, 70, 229, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .lesson-content {
+                padding: 2rem 1.2rem;
+            }
+
+            .lesson-content h1 {
+                font-size: 2rem;
+            }
+
+            .recap-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starfield"></canvas>
+
+    <div class="main-wrapper">
+
+        <a href="index.html" class="back-button">← Back to Explorer</a>
+
+        <div class="lesson-content">
+
+            <h1>✍️ Lesson 2: Prompt Engineering for Beginners</h1>
+            <div class="subtitle">How to talk to AI and get what you want</div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 1: WHAT IS PROMPT ENGINEERING?                   -->
+            <!-- ========================================================= -->
+            <h2>🤔 What is Prompt Engineering?</h2>
+            <p>
+                <strong>Prompt Engineering</strong> is the art of <strong>asking AI the right questions</strong> to get the best answers.
+            </p>
+            <p>
+                Think of it like giving instructions to a very smart assistant. The better your instructions, the better the results!
+            </p>
+
+            <div class="highlight-box">
+                <p><strong>💡 Simple definition:</strong> Prompt Engineering is learning how to talk to AI so it understands exactly what you want.</p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 2: WHY IT MATTERS                               -->
+            <!-- ========================================================= -->
+            <h2>🎯 Why Does It Matter?</h2>
+            <ul>
+                <li><strong>Get better answers:</strong> A good prompt gives you a good response.</li>
+                <li><strong>Save time:</strong> No more re-writing the same question over and over.</li>
+                <li><strong>Unlock AI's full potential:</strong> Most people use AI at 10% – good prompts unlock 90%.</li>
+                <li><strong>It's a superpower:</strong> Prompt Engineers are in high demand right now.</li>
+            </ul>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 3: THE 3 PARTS OF A GOOD PROMPT                 -->
+            <!-- ========================================================= -->
+            <h2>📝 The 3 Parts of a Good Prompt</h2>
+
+            <h3>1. 🎯 Role / Persona</h3>
+            <p>
+                <strong>Tell the AI who it should be.</strong><br />
+                Example: <em>"Act as a professional chef..."</em>
+            </p>
+
+            <h3>2. 📋 Task / Goal</h3>
+            <p>
+                <strong>Tell the AI exactly what you want it to do.</strong><br />
+                Example: <em>"...write a 5-step recipe for a chocolate cake..."</em>
+            </p>
+
+            <h3>3. 📐 Format / Constraints</h3>
+            <p>
+                <strong>Tell the AI how you want the answer.</strong><br />
+                Example: <em>"...in bullet points, using simple language."</em>
+            </p>
+
+            <div class="highlight-box">
+                <p><strong>🧠 Full example:</strong> <em>"Act as a professional chef. Write a 5-step recipe for a chocolate cake in bullet points using simple language."</em></p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 4: PROMPT EXAMPLES                               -->
+            <!-- ========================================================= -->
+            <h2>💬 Prompt Examples</h2>
+
+            <h3>❌ Bad Prompt (Vague)</h3>
+            <div class="code-block" style="border-left: 4px solid rgb(239, 68, 68);">
+                <span class="string">"Write about AI."</span>
+            </div>
+            <p style="color: rgb(248, 113, 113);">
+                <strong>Problem:</strong> Too vague – the AI doesn't know what you want.
+            </p>
+
+            <h3>✅ Good Prompt (Specific)</h3>
+            <div class="code-block" style="border-left: 4px solid rgb(74, 222, 128);">
+                <span class="string">"Act as a technology teacher. Write a 3-paragraph introduction to Artificial Intelligence for high school students. Use simple language and include real-world examples."</span>
+            </div>
+            <p style="color: rgb(74, 222, 128);">
+                <strong>Why it works:</strong> Role, task, audience, format, and examples are all clear.
+            </p>
+
+            <h3>🔄 Prompt Chaining (Advanced)</h3>
+            <div class="code-block" style="border-left: 4px solid rgb(167, 139, 250);">
+                <span class="string">"First, explain what AI is. Then, give 3 examples of AI in daily life. Finally, list 2 risks of AI."</span>
+            </div>
+            <p style="color: rgb(196, 181, 253);">
+                <strong>Why it works:</strong> Break big tasks into smaller steps.
+            </p>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 5: TIPS FOR BETTER PROMPTS                      -->
+            <!-- ========================================================= -->
+            <h2>💡 Tips for Better Prompts</h2>
+            <ul>
+                <li><strong>Be specific:</strong> "Write a poem" is vague. "Write a 4-line poem about friendship" is better.</li>
+                <li><strong>Give examples:</strong> "Write in this style: [example]"</li>
+                <li><strong>Tell AI what NOT to do:</strong> "Don't use jargon. Don't repeat yourself."</li>
+                <li><strong>Iterate:</strong> If the answer isn't perfect, refine your prompt and try again.</li>
+                <li><strong>Ask for different formats:</strong> "Give me the answer as a table / checklist / dialogue."</li>
+            </ul>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 6: YOUR FIRST PROMPT CHALLENGE                  -->
+            <!-- ========================================================= -->
+            <h2>🔬 Challenge: Your First Prompt</h2>
+            <p>
+                <strong>Try this right now:</strong>
+            </p>
+            <p>
+                <strong>Prompt:</strong> <em>"Act as a coding teacher. Write a simple HTML page that shows a 'Hello World' message. Include a button that says 'Click Me' that shows an alert."</em>
+            </p>
+            <p>
+                <strong>What to do:</strong> Copy this prompt, paste it into an AI (like ChatGPT), and see what it gives you. Then try to improve the prompt!
+            </p>
+
+            <div class="highlight-box">
+                <p><strong>🚀 Next level:</strong> Add more constraints: <em>"...use a dark theme with purple accents and make the button round."</em></p>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 7: WHAT YOU'VE LEARNED                          -->
+            <!-- ========================================================= -->
+            <h2>🌟 What You've Learned</h2>
+
+            <div class="recap-grid">
+                <div class="recap-card">
+                    <div class="icon">💬</div>
+                    <h4>What Prompt Engineering Is</h4>
+                    <p>Asking AI the right questions to get the best answers.</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">🎯</div>
+                    <h4>The 3 Parts</h4>
+                    <p>Role, Task, Format – the perfect prompt formula.</p>
+                </div>
+
+                <div class="recap-card">
+                    <div class="icon">💡</div>
+                    <h4>Tips & Examples</h4>
+                    <p>How to write better prompts and avoid common mistakes.</p>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!--  SECTION 8: COMPLETE BUTTON                              -->
+            <!-- ========================================================= -->
+            <div style="text-align: center;">
+                <button class="complete-btn" onclick="completeLesson()">✅ I've Completed This Lesson</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ---------- STARFIELD ----------
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let stars = [];
+
+        const STAR_COUNT = 200;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            createStars();
+        }
+
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.3,
+                    speed: Math.random() * 0.8 + 0.2,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    direction: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let star of stars) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + star.opacity + ')';
+                ctx.fill();
+
+                star.x += star.speed * star.direction;
+
+                if (star.x > width) {
+                    star.x = 0;
+                    star.y = Math.random() * height;
+                } else if (star.x < 0) {
+                    star.x = width;
+                    star.y = Math.random() * height;
+                }
+            }
+
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        function completeLesson() {
+            alert('🎉 Well done, mate!\n\nYou\'ve just completed Lesson 2!\n\nYou now know:\n- What Prompt Engineering is\n- The 3 parts of a good prompt\n- How to write better prompts\n\nReady to build your first AI website? 🚀');
+            window.location.href = 'index.html';
+        }
+
+        console.log('✍️ Lesson 2 is ready!');
+    </script>
+
+</body>
+</html>
