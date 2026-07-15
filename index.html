@@ -40,7 +40,7 @@
             margin: 0 auto;
         }
 
-        /* ---------- CLEAN TEXT LOGO (NO IMAGE, NO DUPLICATES) ---------- */
+        /* ---------- CLEAN TEXT LOGO ---------- */
         .logo-header {
             display: flex;
             align-items: center;
@@ -147,6 +147,32 @@
             color: rgb(252, 211, 77);
             border: 1px solid rgba(251, 191, 36, 0.15);
             cursor: pointer;
+        }
+
+        /* ---------- DICTIONARY BUTTON ---------- */
+        .dictionary-btn {
+            display: inline-block;
+            padding: 0.8rem 2.5rem;
+            border-radius: 60px;
+            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
+            color: rgb(255, 255, 255);
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(167, 139, 250, 0.3);
+            transition: all 0.3s;
+            margin: 0 auto 2rem auto;
+            display: inline-block;
+        }
+
+        .dictionary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(167, 139, 250, 0.5);
+        }
+
+        .dictionary-wrapper {
+            text-align: center;
+            margin: 2rem 0;
         }
 
         /* ---------- AGENT / SIGN IN SECTION ---------- */
@@ -301,7 +327,6 @@
 </head>
 
 <body>
-    <a href="dictionary.html" style="display:inline-block; padding:0.8rem 2rem; border-radius:60px; background:linear-gradient(135deg, rgb(167,139,250), rgb(96,165,250)); color:white; font-weight:600; text-decoration:none; margin-top:2rem;">📚 Open Coding Dictionary</a>
 
     <!-- STARFIELD CANVAS -->
     <canvas id="starfield"></canvas>
@@ -309,9 +334,9 @@
     <!-- MAIN WRAPPER -->
     <div class="main-wrapper">
 
-        <!-- CLEAN LOGO: JUST ONE TEXT, NO IMAGE, NO DUPLICATES -->
+        <!-- CLEAN LOGO -->
         <div class="logo-header">
-            <span>🤖 AfroNova AI v3</span>
+            <span>👩‍🎓 AfroNova AI v3</span>
         </div>
 
         <!-- PAGE TITLE -->
@@ -320,18 +345,25 @@
             <p>Build, learn, and grow with AI</p>
         </div>
 
+        <!-- ========================================================= -->
+        <!-- DICTIONARY BUTTON (RIGHT HERE - IN THE CORRECT PLACE!)   -->
+        <!-- ========================================================= -->
+        <div class="dictionary-wrapper">
+            <a href="dictionary.html" class="dictionary-btn">📚 Open Coding Dictionary</a>
+        </div>
+
         <!-- LESSON CARDS -->
         <div class="lesson-container">
             <div class="lesson-card">
                 <h3>📘 Lesson 1</h3>
                 <p>What is Artificial Intelligence?</p>
-                <a href="lesson1.html" class="primary" style="text-decoration:none; display:inline-block; padding:0.6rem 2rem; border-radius:60px; background:linear-gradient(135deg, rgb(124, 58, 237), rgb(79, 70, 229)); color:white; font-weight:600; font-size:0.9rem;">Start Lesson</a>
+                <a href="lesson1.html" style="text-decoration:none; display:inline-block; padding:0.6rem 2rem; border-radius:60px; background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); color:white; font-weight:600; font-size:0.9rem;">Start Lesson</a>
             </div>
 
             <div class="lesson-card">
                 <h3>✍️ Lesson 2</h3>
                 <p>Prompt Engineering for beginners</p>
-                <a href="lesson2.html" class="coming" style="text-decoration:none; display:inline-block; padding:0.6rem 2rem; border-radius:60px; background:rgba(251,191,36,0.1); color:rgb(252,211,77); font-weight:600; font-size:0.9rem; border:1px solid rgba(251,191,36,0.15);">Start Lesson</a>
+                <a href="lesson2.html" style="text-decoration:none; display:inline-block; padding:0.6rem 2rem; border-radius:60px; background:rgba(251,191,36,0.1); color:rgb(252,211,77); font-weight:600; font-size:0.9rem; border:1px solid rgba(251,191,36,0.15);">Start Lesson</a>
             </div>
 
             <div class="lesson-card">
@@ -384,9 +416,9 @@
 
     </div>
 
-    <!-- JAVASCRIPT - Smaller Stars + Side-to-Side Movement -->
+    <!-- JAVASCRIPT -->
     <script>
-        // ---------- STARFIELD (small stars, horizontal drift) ----------
+        // ---------- STARFIELD ----------
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
 
@@ -409,10 +441,10 @@
                 stars.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    radius: Math.random() * 1.5 + 0.3,  // Small (0.3 to 1.8px)
-                    speed: Math.random() * 0.8 + 0.2,   // Gentle drift
+                    radius: Math.random() * 1.5 + 0.3,
+                    speed: Math.random() * 0.8 + 0.2,
                     opacity: Math.random() * 0.7 + 0.3,
-                    direction: Math.random() > 0.5 ? 1 : -1  // Left or right
+                    direction: Math.random() > 0.5 ? 1 : -1
                 });
             }
         }
@@ -426,10 +458,8 @@
                 ctx.fillStyle = 'rgba(255, 255, 255, ' + star.opacity + ')';
                 ctx.fill();
 
-                // Move horizontally (side to side)
                 star.x += star.speed * star.direction;
 
-                // Wrap around edges
                 if (star.x > width) {
                     star.x = 0;
                     star.y = Math.random() * height;
@@ -441,6 +471,10 @@
 
             requestAnimationFrame(drawStars);
         }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
 
         // ---------- BUTTON INTERACTIONS ----------
         function startLesson() {
@@ -454,11 +488,6 @@
         function comingSoon() {
             alert('🚧 Coming Soon!\n\nThis lesson is currently in development. Check back later!');
         }
-
-        // ---------- START ----------
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        drawStars();
 
         console.log('✨ AfroNova AI v3 is alive!');
     </script>
