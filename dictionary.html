@@ -1,1 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Coding Dictionary</title>
 
+    <style>
+        /* ---------- SAME STYLE ---------- */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: rgb(11, 14, 26);
+            color: rgb(240, 244, 255);
+            min-height: 100vh;
+            padding: 1.5rem 1rem 0;
+            overflow-x: hidden;
+        }
+
+        [id="starfield"] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            display: block;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ---------- HEADER ---------- */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250), rgb(52, 211, 153));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-header p {
+            color: rgb(148, 163, 184);
+            font-size: 1.2rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(167, 139, 250);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 1rem;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgb(196, 181, 253);
+        }
+
+        /* ---------- CATEGORY TABS ---------- */
+        .category-tabs {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+
+        .category-tab {
+            padding: 0.7rem 1.8rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: rgb(148, 163, 184);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .category-tab:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgb(240, 244, 255);
+        }
+
+        .category-tab.active {
+            background: rgba(167, 139, 250, 0.15);
+            border-color: rgb(167, 139, 250);
+            color: rgb(167, 139, 250);
+        }
+
+        /* ---------- CONCEPT GRID ---------- */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 3rem;
+        }
+
+        .concept-btn {
+            padding: 1.2rem 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgb(203, 213, 225);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .concept-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-3px);
+            border-color: rgba(167, 139, 250, 0.3);
+        }
+
+        .concept-btn .icon {
+            font-size: 1.5rem;
+        }
+
+        .concept-btn .tag {
+            font-size: 0.65rem;
+            color: rgb(100, 116, 139);
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        /* ---------- POPUP / DEMO CARD ---------- */
+        .demo-card {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 30px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 3rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .demo-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .demo-card .demo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .demo-card .demo-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgb(238, 242, 255);
+            margin: 0;
+        }
+
+        .demo-card .demo-header .close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: rgb(148, 163, 184);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .demo-card .demo-header .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgb(240, 244, 255);
+        }
+
+        .demo-card .explanation {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-card .explanation strong {
+            color: rgb(196, 181, 253);
+        }
+
+        .demo-card .analogy {
+            background: rgba(167, 139, 250, 0.06);
+            border-left: 4px solid rgb(167, 139, 250);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            color: rgb(203, 213, 225);
+        }
+
+        .demo-card .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgb(203, 213, 225);
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 1.5rem 0;
+        }
+
+        .demo-card .code-block .comment {
+            color: rgb(100, 116, 139);
+        }
+
+        .demo-card .code-block .keyword {
+            color: rgb(167, 139, 250);
+        }
+
+        .demo-card .code-block .string {
+            color: rgb(74, 222, 128);
+        }
+
+        .demo-card .code-block .number {
+            color: rgb(251, 191, 36);
+        }
+
+        .demo-card .code-block .property {
+            color: rgb(96, 165, 250);
+        }
+
+        /* ---------- DEMO BOX (live example) ---------- */
+        .demo-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .demo-box .example-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 0.5rem 0;
+            transition: all 0.5s ease;
+        }
+
+        .demo-box .example-container .target {
+            background: rgba(167, 139, 250, 0.2);
+            border: 2px solid rgb(167, 139, 250);
+            border-radius: 8px;
+            padding: 0.8rem;
+            color: rgb(240, 244, 255);
+            transition: all 0.5s ease;
+        }
+
+        /* Control sliders */
+        .controls {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .controls label {
+            color: rgb(148, 163, 184);
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .controls input[type="range"] {
+            width: 150px;
+            accent-color: rgb(167, 139, 250);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 4px;
+            cursor: pointer;
+        }
+
+        .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: rgb(167, 139, 250);
+            cursor: pointer;
+        }
+
+        .controls .value-display {
+            color: rgb(196, 181, 253);
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 1024px) {
+            .concept-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .concept-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .demo-card {
+                padding: 1.5rem;
+            }
+
+            .demo-card .demo-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .controls label {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .concept-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .category-tab {
+                width: 100%;
+                text-align: center;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starfield"></canvas>
+
+    <div class="main-wrapper">
+
+        <a href="index.html" class="back-button">← Back to Explorer</a>
+
+        <div class="page-header">
+            <h1>📚 Interactive Coding Dictionary</h1>
+            <p>Tap a concept to learn what it means — with live examples!</p>
+        </div>
+
+        <!-- CATEGORY TABS -->
+        <div class="category-tabs">
+            <button class="category-tab active" data-category="all">All</button>
+            <button class="category-tab" data-category="html">HTML</button>
+            <button class="category-tab" data-category="css">CSS</button>
+            <button class="category-tab" data-category="js">JavaScript</button>
+        </div>
+
+        <!-- CONCEPT BUTTONS GRID -->
+        <div class="concept-grid" id="conceptGrid">
+            <!-- CSS Concepts -->
+            <button class="concept-btn" data-concept="margin" data-category="css">
+                <span class="icon">📦</span>
+                Margin
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="padding" data-category="css">
+                <span class="icon">📦</span>
+                Padding
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="flexbox" data-category="css">
+                <span class="icon">🧭</span>
+                Flexbox
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="grid" data-category="css">
+                <span class="icon">📐</span>
+                Grid
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="position" data-category="css">
+                <span class="icon">📍</span>
+                Position
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="z-index" data-category="css">
+                <span class="icon">📚</span>
+                z-index
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="border-radius" data-category="css">
+                <span class="icon">🔄</span>
+                Border Radius
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="gradient" data-category="css">
+                <span class="icon">🎨</span>
+                Gradient
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="transition" data-category="css">
+                <span class="icon">✨</span>
+                Transition
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="transform" data-category="css">
+                <span class="icon">🔄</span>
+                Transform
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="box-shadow" data-category="css">
+                <span class="icon">🌓</span>
+                Box Shadow
+                <span class="tag">CSS</span>
+            </button>
+            <button class="concept-btn" data-concept="display" data-category="css">
+                <span class="icon">👁️</span>
+                Display
+                <span class="tag">CSS</span>
+            </button>
+
+            <!-- HTML Concepts -->
+            <button class="concept-btn" data-concept="div" data-category="html">
+                <span class="icon">📦</span>
+                Div
+                <span class="tag">HTML</span>
+            </button>
+            <button class="concept-btn" data-concept="span" data-category="html">
+                <span class="icon">✏️</span>
+                Span
+                <span class="tag">HTML</span>
+            </button>
+            <button class="concept-btn" data-concept="class-id" data-category="html">
+                <span class="icon">🏷️</span>
+                Class vs ID
+                <span class="tag">HTML</span>
+            </button>
+            <button class="concept-btn" data-concept="button" data-category="html">
+                <span class="icon">🔘</span>
+                Button
+                <span class="tag">HTML</span>
+            </button>
+            <button class="concept-btn" data-concept="input" data-category="html">
+                <span class="icon">✍️</span>
+                Input
+                <span class="tag">HTML</span>
+            </button>
+
+            <!-- JavaScript Concepts -->
+            <button class="concept-btn" data-concept="function" data-category="js">
+                <span class="icon">⚡</span>
+                Function
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="variable" data-category="js">
+                <span class="icon">📦</span>
+                Variable
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="event" data-category="js">
+                <span class="icon">🖱️</span>
+                Events
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="loop" data-category="js">
+                <span class="icon">🔁</span>
+                Loop
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="array" data-category="js">
+                <span class="icon">📋</span>
+                Array
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="object" data-category="js">
+                <span class="icon">🧩</span>
+                Object
+                <span class="tag">JS</span>
+            </button>
+            <button class="concept-btn" data-concept="alert" data-category="js">
+                <span class="icon">💬</span>
+                Alert
+                <span class="tag">JS</span>
+            </button>
+        </div>
+
+        <!-- DEMO CARD (populates when concept is clicked) -->
+        <div class="demo-card" id="demoCard">
+            <div class="demo-header">
+                <h2 id="demoTitle">Concept</h2>
+                <button class="close-btn" onclick="closeDemo()">✕ Close</button>
+            </div>
+            <div id="demoContent">
+                <!-- Filled by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ---------- STARFIELD ----------
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let stars = [];
+
+        const STAR_COUNT = 200;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            createStars();
+        }
+
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.3,
+                    speed: Math.random() * 0.8 + 0.2,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    direction: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let star of stars) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + star.opacity + ')';
+                ctx.fill();
+
+                star.x += star.speed * star.direction;
+
+                if (star.x > width) {
+                    star.x = 0;
+                    star.y = Math.random() * height;
+                } else if (star.x < 0) {
+                    star.x = width;
+                    star.y = Math.random() * height;
+                }
+            }
+
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        // ---------- CONCEPT DATA ----------
+        const concepts = {
+            margin: {
+                name: 'Margin',
+                category: 'css',
+                icon: '📦',
+                explanation: 'Margin creates space <strong>OUTSIDE</strong> an element\'s border. It pushes other elements away.',
+                analogy: 'Like the empty space between your house and your neighbour\'s house. It\'s the distance you keep from others.',
+                code: `/* Space outside the box */\n<span class="property">margin</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Specific sides */\n<span class="property">margin-top</span>: <span class="number">10</span><span class="number">px</span>;\n<span class="property">margin-right</span>: <span class="number">20</span><span class="number">px</span>;\n<span class="property">margin-bottom</span>: <span class="number">30</span><span class="number">px</span>;\n<span class="property">margin-left</span>: <span class="number">40</span><span class="number">px</span>;`,
+                demoHTML: `<div class="example-container">
+                    <div class="target" id="marginTarget" style="margin:20px; background:rgba(167,139,250,0.3);">
+                        This box has 20px margin
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Margin: <span class="value-display" id="marginValue">20</span>px
+                        <input type="range" min="0" max="80" value="20" id="marginSlider" oninput="updateMargin(this.value)">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateMargin = function(value) {
+                        document.getElementById('marginTarget').style.margin = value + 'px';
+                        document.getElementById('marginValue').textContent = value;
+                    };
+                }
+            },
+
+            padding: {
+                name: 'Padding',
+                category: 'css',
+                icon: '📦',
+                explanation: 'Padding creates space <strong>INSIDE</strong> an element\'s border, between the border and the content. It pushes content inward.',
+                analogy: 'Like the space between your wall and your furniture. It\'s the breathing room inside your room.',
+                code: `/* Space inside the box */\n<span class="property">padding</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Specific sides */\n<span class="property">padding-top</span>: <span class="number">10</span><span class="number">px</span>;\n<span class="property">padding-right</span>: <span class="number">20</span><span class="number">px</span>;\n<span class="property">padding-bottom</span>: <span class="number">30</span><span class="number">px</span>;\n<span class="property">padding-left</span>: <span class="number">40</span><span class="number">px</span>;`,
+                demoHTML: `<div class="example-container">
+                    <div class="target" id="paddingTarget" style="padding:20px; background:rgba(167,139,250,0.3);">
+                        This box has 20px padding
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Padding: <span class="value-display" id="paddingValue">20</span>px
+                        <input type="range" min="0" max="80" value="20" id="paddingSlider" oninput="updatePadding(this.value)">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updatePadding = function(value) {
+                        document.getElementById('paddingTarget').style.padding = value + 'px';
+                        document.getElementById('paddingValue').textContent = value;
+                    };
+                }
+            },
+
+            flexbox: {
+                name: 'Flexbox',
+                category: 'css',
+                icon: '🧭',
+                explanation: 'Flexbox is a layout system that arranges items in a <strong>row or column</strong>, distributing space between them. Perfect for making things center or spread out.',
+                analogy: 'Like putting items on a shelf – you can align them left, right, center, or spread them evenly with equal gaps.',
+                code: `/* Enable flexbox */\n<span class="property">display</span>: <span class="keyword">flex</span>;\n\n/* Horizontal alignment */\n<span class="property">justify-content</span>: <span class="keyword">center</span>;\n\n/* Vertical alignment */\n<span class="property">align-items</span>: <span class="keyword">center</span>;\n\n/* Gap between items */\n<span class="property">gap</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Direction */\n<span class="property">flex-direction</span>: <span class="keyword">row</span>; /* row, column, row-reverse */`,
+                demoHTML: `<div class="example-container" style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; background:rgba(167,139,250,0.1); padding:1rem;">
+                    <div style="background:rgba(167,139,250,0.3); padding:1rem 1.5rem; border-radius:8px;">Item 1</div>
+                    <div style="background:rgba(96,165,250,0.3); padding:1rem 1.5rem; border-radius:8px;">Item 2</div>
+                    <div style="background:rgba(52,211,153,0.3); padding:1rem 1.5rem; border-radius:8px;">Item 3</div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Justify:
+                        <select id="flexJustify" onchange="updateFlex()">
+                            <option value="flex-start">Start</option>
+                            <option value="center" selected>Center</option>
+                            <option value="flex-end">End</option>
+                            <option value="space-between">Space Between</option>
+                            <option value="space-around">Space Around</option>
+                        </select>
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateFlex = function() {
+                        const containers = document.querySelectorAll('.example-container');
+                        containers.forEach(c => {
+                            c.style.justifyContent = document.getElementById('flexJustify').value;
+                        });
+                    };
+                }
+            },
+
+            grid: {
+                name: 'Grid',
+                category: 'css',
+                icon: '📐',
+                explanation: 'Grid is a layout system that creates <strong>rows and columns</strong> like a spreadsheet. Perfect for complex layouts with alignment.',
+                analogy: 'Like a chessboard or a spreadsheet – you can place items in exact cells and control their size.',
+                code: `/* Enable grid */\n<span class="property">display</span>: <span class="keyword">grid</span>;\n\n/* Define columns */\n<span class="property">grid-template-columns</span>: <span class="number">1</span><span class="number">fr</span> <span class="number">1</span><span class="number">fr</span> <span class="number">1</span><span class="number">fr</span>;\n\n/* Define rows */\n<span class="property">grid-template-rows</span>: <span class="number">auto</span> <span class="number">auto</span>;\n\n/* Gap between items */\n<span class="property">gap</span>: <span class="number">20</span><span class="number">px</span>;`,
+                demoHTML: `<div class="example-container" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; background:rgba(167,139,250,0.1); padding:1rem;">
+                    <div style="background:rgba(167,139,250,0.3); padding:1rem; border-radius:8px; text-align:center;">1</div>
+                    <div style="background:rgba(96,165,250,0.3); padding:1rem; border-radius:8px; text-align:center;">2</div>
+                    <div style="background:rgba(52,211,153,0.3); padding:1rem; border-radius:8px; text-align:center;">3</div>
+                    <div style="background:rgba(251,191,36,0.3); padding:1rem; border-radius:8px; text-align:center;">4</div>
+                    <div style="background:rgba(248,113,113,0.3); padding:1rem; border-radius:8px; text-align:center;">5</div>
+                    <div style="background:rgba(167,139,250,0.3); padding:1rem; border-radius:8px; text-align:center;">6</div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Columns:
+                        <select id="gridColumns" onchange="updateGrid()">
+                            <option value="1fr">1</option>
+                            <option value="1fr 1fr" selected>2</option>
+                            <option value="1fr 1fr 1fr">3</option>
+                            <option value="1fr 1fr 1fr 1fr">4</option>
+                        </select>
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateGrid = function() {
+                        const containers = document.querySelectorAll('.example-container');
+                        containers.forEach(c => {
+                            c.style.gridTemplateColumns = document.getElementById('gridColumns').value;
+                        });
+                    };
+                }
+            },
+
+            'border-radius': {
+                name: 'Border Radius',
+                category: 'css',
+                icon: '🔄',
+                explanation: 'Border-radius rounds the corners of an element. The higher the value, the rounder the corners.',
+                analogy: 'Like sanding down the sharp edges of a wooden block to make it smooth and round.',
+                code: `/* Round all corners */\n<span class="property">border-radius</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Round specific corners */\n<span class="property">border-top-left-radius</span>: <span class="number">10</span><span class="number">px</span>;\n<span class="property">border-top-right-radius</span>: <span class="number">20</span><span class="number">px</span>;`,
+                demoHTML: `<div class="example-container">
+                    <div class="target" id="radiusTarget" style="border-radius:20px; background:rgba(167,139,250,0.3); padding:2rem; transition:all 0.3s;">
+                        Border-radius: <span id="radiusValue">20</span>px
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Radius: <span class="value-display" id="radiusDisplay">20</span>px
+                        <input type="range" min="0" max="100" value="20" id="radiusSlider" oninput="updateRadius(this.value)">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateRadius = function(value) {
+                        document.getElementById('radiusTarget').style.borderRadius = value + 'px';
+                        document.getElementById('radiusValue').textContent = value;
+                        document.getElementById('radiusDisplay').textContent = value;
+                    };
+                }
+            },
+
+            gradient: {
+                name: 'Gradient',
+                category: 'css',
+                icon: '🎨',
+                explanation: 'Gradient is a smooth transition between two or more colours. It creates beautiful backgrounds and text effects.',
+                analogy: 'Like a sunrise – the sky gradually changes from dark blue to orange to yellow.',
+                code: `/* Linear gradient (top to bottom) */\n<span class="property">background</span>: <span class="keyword">linear-gradient</span>(<span class="keyword">to bottom</span>, <span class="string">#7c3aed</span>, <span class="string">#4f46e5</span>);\n\n/* Diagonal gradient */\n<span class="property">background</span>: <span class="keyword">linear-gradient</span>(<span class="number">135</span><span class="number">deg</span>, <span class="string">rgb(167,139,250)</span>, <span class="string">rgb(96,165,250)</span>, <span class="string">rgb(52,211,153)</span>);`,
+                demoHTML: `<div class="example-container">
+                    <div id="gradientTarget" style="background:linear-gradient(135deg, rgb(167,139,250), rgb(96,165,250)); padding:2rem; border-radius:12px; transition:all 0.5s;">
+                        <strong>Gradient Background</strong>
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Angle: <span class="value-display" id="angleDisplay">135</span>°
+                        <input type="range" min="0" max="360" value="135" id="angleSlider" oninput="updateGradient(this.value)">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateGradient = function(value) {
+                        const target = document.getElementById('gradientTarget');
+                        target.style.background = `linear-gradient(${value}deg, rgb(167,139,250), rgb(96,165,250))`;
+                        document.getElementById('angleDisplay').textContent = value;
+                    };
+                }
+            },
+
+            transition: {
+                name: 'Transition',
+                category: 'css',
+                icon: '✨',
+                explanation: 'Transition makes changes happen <strong>smoothly</strong> over time. Instead of jumping instantly, the element glides to its new state.',
+                analogy: 'Like a door that slowly closes instead of slamming shut.',
+                code: `/* Apply transition to all properties */\n<span class="property">transition</span>: <span class="keyword">all</span> <span class="number">0.3</span><span class="number">s</span> <span class="keyword">ease</span>;\n\n/* Specific property */\n<span class="property">transition</span>: <span class="property">background</span> <span class="number">0.5</span><span class="number">s</span>, <span class="property">transform</span> <span class="number">0.3</span><span class="number">s</span>;`,
+                demoHTML: `<div class="example-container">
+                    <div id="transitionTarget" style="background:rgba(167,139,250,0.3); padding:2rem; border-radius:12px; transition:all 0.5s ease; cursor:pointer;" onmouseover="this.style.background='rgba(96,165,250,0.5)'; this.style.transform='scale(1.05)'; this.style.padding='3rem'" onmouseout="this.style.background='rgba(167,139,250,0.3)'; this.style.transform='scale(1)'; this.style.padding='2rem'">
+                        <strong>Hover over me! 👆</strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">Watch the smooth transition</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Speed: <span class="value-display" id="speedDisplay">0.5</span>s
+                        <input type="range" min="0.1" max="2" step="0.1" value="0.5" id="speedSlider" oninput="updateSpeed(this.value)">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateSpeed = function(value) {
+                        document.getElementById('transitionTarget').style.transition = `all ${value}s ease`;
+                        document.getElementById('speedDisplay').textContent = value;
+                    };
+                }
+            },
+
+            transform: {
+                name: 'Transform',
+                category: 'css',
+                icon: '🔄',
+                explanation: 'Transform lets you <strong>move, rotate, scale, or skew</strong> an element. It\'s like a 3D manipulation tool.',
+                analogy: 'Like holding a piece of paper and rotating it, scaling it up, or moving it around.',
+                code: `/* Scale (zoom) */\n<span class="property">transform</span>: <span class="keyword">scale</span>(<span class="number">1.5</span>);\n\n/* Rotate */\n<span class="property">transform</span>: <span class="keyword">rotate</span>(<span class="number">45</span><span class="number">deg</span>);\n\n/* Translate (move) */\n<span class="property">transform</span>: <span class="keyword">translate</span>(<span class="number">50</span><span class="number">px</span>, <span class="number">20</span><span class="number">px</span>);\n\n/* Combine all! */\n<span class="property">transform</span>: <span class="keyword">scale</span>(<span class="number">1.2</span>) <span class="keyword">rotate</span>(<span class="number">10</span><span class="number">deg</span>) <span class="keyword">translate</span>(<span class="number">20</span><span class="number">px</span>, <span class="number">10</span><span class="number">px</span>);`,
+                demoHTML: `<div class="example-container" style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
+                    <div id="transformTarget" style="background:rgba(167,139,250,0.3); padding:1.5rem 2.5rem; border-radius:12px; transition:transform 0.3s;">
+                        Transform Me!
+                    </div>
+                </div>
+                <div class="controls" style="flex-wrap:wrap;">
+                    <label>
+                        Scale: <span class="value-display" id="scaleDisplay">1</span>
+                        <input type="range" min="0.5" max="2" step="0.1" value="1" id="scaleSlider" oninput="updateTransform()">
+                    </label>
+                    <label>
+                        Rotate: <span class="value-display" id="rotateDisplay">0</span>°
+                        <input type="range" min="0" max="360" value="0" id="rotateSlider" oninput="updateTransform()">
+                    </label>
+                    <label>
+                        Translate X: <span class="value-display" id="translateDisplay">0</span>px
+                        <input type="range" min="-100" max="100" value="0" id="translateSlider" oninput="updateTransform()">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateTransform = function() {
+                        const scale = document.getElementById('scaleSlider').value;
+                        const rotate = document.getElementById('rotateSlider').value;
+                        const translate = document.getElementById('translateSlider').value;
+                        const target = document.getElementById('transformTarget');
+                        target.style.transform = `scale(${scale}) rotate(${rotate}deg) translateX(${translate}px)`;
+                        document.getElementById('scaleDisplay').textContent = scale;
+                        document.getElementById('rotateDisplay').textContent = rotate;
+                        document.getElementById('translateDisplay').textContent = translate;
+                    };
+                }
+            },
+
+            div: {
+                name: 'Div',
+                category: 'html',
+                icon: '📦',
+                explanation: '`<div>` is a <strong>container</strong> that groups other HTML elements. It\'s the most common building block for layouts.',
+                analogy: 'Like a cardboard box – you put things inside it to organise them and move them around together.',
+                code: `&lt;div <span class="keyword">class</span>=<span class="string">"container"</span>&gt;\n  &lt;h1&gt;Hello World&lt;/h1&gt;\n  &lt;p&gt;This is inside a div!&lt;/p&gt;\n&lt;/div&gt;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1rem; border-radius:12px; border:2px dashed rgba(167,139,250,0.3);">
+                    <div style="background:rgba(167,139,250,0.2); padding:1rem; border-radius:8px;">
+                        <strong>📦 This is a Div</strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.9rem; color:rgb(148,163,184);">It can contain anything: text, images, buttons, other divs!</p>
+                    </div>
+                    <div style="background:rgba(96,165,250,0.2); padding:1rem; border-radius:8px; margin-top:0.5rem;">
+                        <strong>📦 Another Div</strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.9rem; color:rgb(148,163,184);">Divs are stackable – you can put them inside each other.</p>
+                    </div>
+                </div>`
+            },
+
+            span: {
+                name: 'Span',
+                category: 'html',
+                icon: '✏️',
+                explanation: '`<span>` is an <strong>inline</strong> container for styling a <strong>piece of text</strong> within a line. It doesn\'t create a new line.',
+                analogy: 'Like a highlighter – you use it on specific words inside a sentence.',
+                code: `&lt;p&gt;This is a &lt;span <span class="keyword">style</span>=<span class="string">"color: purple; font-weight: bold;"</span>&gt;highlighted word&lt;/span&gt; in a sentence.&lt;/p&gt;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px;">
+                    <p style="font-size:1.2rem; line-height:2;">
+                        This is a sentence with a 
+                        <span style="background:rgba(167,139,250,0.3); padding:0.1rem 0.4rem; border-radius:4px; font-weight:bold; color:rgb(196,181,253);">highlighted word</span> 
+                        inside it. 
+                        <span style="background:rgba(96,165,250,0.3); padding:0.1rem 0.4rem; border-radius:4px;">Another span</span> 
+                        and 
+                        <span style="background:rgba(52,211,153,0.3); padding:0.1rem 0.4rem; border-radius:4px;">one more</span>!
+                    </p>
+                    <p style="font-size:0.85rem; color:rgb(148,163,184);">Spans don't break the line – they stay inside the sentence.</p>
+                </div>`
+            },
+
+            'class-id': {
+                name: 'Class vs ID',
+                category: 'html',
+                icon: '🏷️',
+                explanation: '`class` is for <strong>reusing</strong> styles on multiple elements. `id` is for <strong>uniquely identifying</strong> one element.',
+                analogy: 'Class = a group name (like "students" – many people). ID = a unique name (like "John Smith" – only one person).',
+                code: `&lt;!-- Class (can be reused) --&gt;\n&lt;div <span class="keyword">class</span>=<span class="string">"card"</span>&gt;Card 1&lt;/div&gt;\n&lt;div <span class="keyword">class</span>=<span class="string">"card"</span>&gt;Card 2&lt;/div&gt;\n&lt;div <span class="keyword">class</span>=<span class="string">"card"</span>&gt;Card 3&lt;/div&gt;\n\n&lt;!-- ID (must be unique) --&gt;\n&lt;div <span class="keyword">id</span>=<span class="string">"starfield"</span>&gt;Canvas&lt;/div&gt;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1rem; border-radius:12px;">
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+                        <div class="card-demo" style="background:rgba(167,139,250,0.2); padding:1rem 1.5rem; border-radius:8px; border:1px solid rgba(167,139,250,0.2);">
+                            <strong style="color:rgb(167,139,250);">Class "card"</strong>
+                            <p style="margin:0.2rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">Reused on many elements</p>
+                        </div>
+                        <div class="card-demo" style="background:rgba(96,165,250,0.2); padding:1rem 1.5rem; border-radius:8px; border:1px solid rgba(96,165,250,0.2);">
+                            <strong style="color:rgb(96,165,250);">Class "card"</strong>
+                            <p style="margin:0.2rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">Same class, different colour!</p>
+                        </div>
+                    </div>
+                    <div style="margin-top:1rem; background:rgba(251,191,36,0.1); padding:0.8rem 1.2rem; border-radius:8px; border:1px solid rgba(251,191,36,0.2);">
+                        <strong style="color:rgb(251,191,36);">ID="unique-element"</strong>
+                        <p style="margin:0.2rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">Only ONE element can have this ID!</p>
+                    </div>
+                </div>`
+            },
+
+            variable: {
+                name: 'Variable',
+                category: 'js',
+                icon: '📦',
+                explanation: 'A variable is a <strong>container</strong> for storing data. You put a value inside, give it a name, and use it later.',
+                analogy: 'Like a labelled box – you put something in it (like "apple"), label it `fruit`, and you can open it anytime to see what\'s inside.',
+                code: `<span class="comment">// Declare a variable</span>\n<span class="keyword">let</span> name = <span class="string">"AI"</span>;\n\n<span class="comment">// Change its value</span>\nname = <span class="string">"Machine Learning"</span>;\n\n<span class="comment">// Constants (never change)</span>\n<span class="keyword">const</span> PI = <span class="number">3.14159</span>;\n\n<span class="comment">// Different data types</span>\n<span class="keyword">let</span> age = <span class="number">25</span>;          <span class="comment">// number</span>\n<span class="keyword">let</span> isReady = <span class="keyword">true</span>;      <span class="comment">// boolean</span>\n<span class="keyword">let</span> fruits = [<span class="string">'apple'</span>, <span class="string">'banana'</span>]; <span class="comment">// array</span>`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1rem; border-radius:12px;">
+                    <div style="display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center;">
+                        <div style="background:rgba(167,139,250,0.2); padding:1rem 1.5rem; border-radius:8px; min-width:120px; text-align:center;">
+                            <div style="font-size:1.5rem;">📦</div>
+                            <strong>name</strong>
+                            <div style="color:rgb(196,181,253);" id="varDisplay1">"AI"</div>
+                        </div>
+                        <div style="background:rgba(96,165,250,0.2); padding:1rem 1.5rem; border-radius:8px; min-width:120px; text-align:center;">
+                            <div style="font-size:1.5rem;">📦</div>
+                            <strong>age</strong>
+                            <div style="color:rgb(96,165,250);" id="varDisplay2">25</div>
+                        </div>
+                        <div style="background:rgba(52,211,153,0.2); padding:1rem 1.5rem; border-radius:8px; min-width:120px; text-align:center;">
+                            <div style="font-size:1.5rem;">📦</div>
+                            <strong>isReady</strong>
+                            <div style="color:rgb(52,211,153);" id="varDisplay3">true</div>
+                        </div>
+                    </div>
+                    <div style="text-align:center; margin-top:0.8rem;">
+                        <button onclick="updateVariables()" style="background:rgba(167,139,250,0.2); border:1px solid rgb(167,139,250); color:rgb(240,244,255); padding:0.5rem 1.5rem; border-radius:40px; cursor:pointer;">Click to Change Values</button>
+                    </div>
+                </div>`,
+                demoJS: function() {
+                    window.updateVariables = function() {
+                        const names = ['AI', 'Machine Learning', 'Deep Learning', 'Neural Network'];
+                        const ages = [25, 30, 35, 40];
+                        const bools = ['true', 'false'];
+                        document.getElementById('varDisplay1').textContent = '"' + names[Math.floor(Math.random() * names.length)] + '"';
+                        document.getElementById('varDisplay2').textContent = ages[Math.floor(Math.random() * ages.length)];
+                        document.getElementById('varDisplay3').textContent = bools[Math.floor(Math.random() * bools.length)];
+                    };
+                }
+            },
+
+            function: {
+                name: 'Function',
+                category: 'js',
+                icon: '⚡',
+                explanation: 'A function is a <strong>reusable block of code</strong> that does a specific task. You write it once, then run (call) it whenever you need it.',
+                analogy: 'Like a recipe – you write the steps once, then you can follow them anytime you want to bake a cake.',
+                code: `<span class="comment">// Declare a function</span>\n<span class="keyword">function</span> <span class="function">startLesson</span>() {\n  <span class="keyword">let</span> message = <span class="string">"Let's begin!"</span>;\n  <span class="function">alert</span>(message);\n}\n\n<span class="comment">// Call (run) the function</span>\n<span class="function">startLesson</span>();\n\n<span class="comment">// Function with parameters</span>\n<span class="keyword">function</span> <span class="function">greet</span>(name) {\n  <span class="keyword">return</span> <span class="string">"Hello, "</span> + name + <span class="string">"!"</span>;\n}`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; text-align:center;">
+                    <div style="background:rgba(167,139,250,0.2); padding:1rem 1.5rem; border-radius:8px; margin-bottom:1rem;">
+                        <strong>⚡ Function: sayHello()</strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.9rem; color:rgb(148,163,184);">This function shows a greeting message</p>
+                    </div>
+                    <button onclick="runFunction()" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.8rem 2.5rem; border-radius:40px; font-weight:600; cursor:pointer; font-size:1rem;">Run Function</button>
+                    <p id="functionOutput" style="margin-top:1rem; color:rgb(196,181,253); min-height:30px;"></p>
+                </div>`,
+                demoJS: function() {
+                    window.runFunction = function() {
+                        const names = ['Mate', 'Developer', 'AI Student', 'Coder', 'Tech Learner'];
+                        const name = names[Math.floor(Math.random() * names.length)];
+                        const message = `👋 Hello, ${name}! This function just ran!`;
+                        document.getElementById('functionOutput').textContent = message;
+                        alert(`⚡ Function called!\n\nHello, ${name}! Welcome to functions!`);
+                    };
+                }
+            },
+
+            event: {
+                name: 'Events',
+                category: 'js',
+                icon: '🖱️',
+                explanation: 'Events are <strong>actions that happen</strong> – like clicking, hovering, typing, or loading a page. You can write code that reacts to these events.',
+                analogy: 'Like a doorbell – when someone rings it (the event), you open the door (the reaction).',
+                code: `<span class="comment">// Click event (in HTML)</span>\n&lt;button <span class="keyword">onclick</span>=<span class="string">"handleClick()"</span>&gt;Click Me&lt;/button&gt;\n\n<span class="comment">// Click event (in JavaScript)</span>\n<span class="keyword">let</span> button = document.<span class="function">getElementById</span>(<span class="string">'myBtn'</span>);\nbutton.<span class="function">addEventListener</span>(<span class="string">'click'</span>, <span class="keyword">function</span>() {\n  <span class="function">alert</span>(<span class="string">'Button clicked!'</span>);\n});\n\n<span class="comment">// Other events</span>\n<span class="comment">// mouseover, mouseout, keydown, submit, load, resize</span>`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; display:flex; flex-direction:column; align-items:center; gap:1rem;">
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="eventClick()" style="background:rgba(167,139,250,0.2); border:1px solid rgb(167,139,250); color:rgb(240,244,255); padding:0.8rem 1.8rem; border-radius:40px; cursor:pointer; transition:0.3s;">🖱️ Click Me</button>
+                        <button onmouseover="eventHover(this)" onmouseout="eventOut(this)" style="background:rgba(96,165,250,0.2); border:1px solid rgb(96,165,250); color:rgb(240,244,255); padding:0.8rem 1.8rem; border-radius:40px; cursor:pointer; transition:0.3s;">🖱️ Hover Me</button>
+                        <button ondblclick="eventDouble()" style="background:rgba(52,211,153,0.2); border:1px solid rgb(52,211,153); color:rgb(240,244,255); padding:0.8rem 1.8rem; border-radius:40px; cursor:pointer; transition:0.3s;">🖱️ Double-Click</button>
+                    </div>
+                    <div id="eventOutput" style="background:rgba(0,0,0,0.3); padding:0.8rem 1.5rem; border-radius:8px; min-height:40px; width:100%; text-align:center; color:rgb(196,181,253);">
+                        Click a button to see the event!
+                    </div>
+                </div>`,
+                demoJS: function() {
+                    window.eventClick = function() {
+                        document.getElementById('eventOutput').textContent = '✅ Click event triggered!';
+                        document.getElementById('eventOutput').style.color = 'rgb(196,181,253)';
+                    };
+                    window.eventHover = function(el) {
+                        el.style.background = 'rgba(167,139,250,0.4)';
+                        el.style.transform = 'scale(1.05)';
+                        document.getElementById('eventOutput').textContent = '🔄 Hover event triggered! Mouse is over the button.';
+                        document.getElementById('eventOutput').style.color = 'rgb(96,165,250)';
+                    };
+                    window.eventOut = function(el) {
+                        el.style.background = 'rgba(96,165,250,0.2)';
+                        el.style.transform = 'scale(1)';
+                        document.getElementById('eventOutput').textContent = '↩️ Mouse left the button.';
+                        document.getElementById('eventOutput').style.color = 'rgb(148,163,184)';
+                    };
+                    window.eventDouble = function() {
+                        document.getElementById('eventOutput').textContent = '🔥 Double-click event triggered!';
+                        document.getElementById('eventOutput').style.color = 'rgb(251,191,36)';
+                        alert('🔥 Double-click detected!');
+                    };
+                }
+            },
+
+            loop: {
+                name: 'Loop',
+                category: 'js',
+                icon: '🔁',
+                explanation: 'A loop <strong>repeats</strong> a block of code multiple times. It\'s used for tasks that need to be done again and again.',
+                analogy: 'Like a washing machine – it spins repeatedly until the cycle is complete.',
+                code: `<span class="comment">// For loop (repeat a specific number of times)</span>\n<span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i < <span class="number">5</span>; i++) {\n  <span class="function">console</span>.<span class="function">log</span>(<span class="string">"Count: "</span> + i);\n}\n\n<span class="comment">// While loop (repeat while condition is true)</span>\n<span class="keyword">let</span> count = <span class="number">0</span>;\n<span class="keyword">while</span> (count < <span class="number">5</span>) {\n  <span class="function">console</span>.<span class="function">log</span>(<span class="string">"Count: "</span> + count);\n  count++;\n}`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; text-align:center;">
+                    <button onclick="runLoop()" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.8rem 2rem; border-radius:40px; font-weight:600; cursor:pointer; font-size:1rem;">🔁 Run Loop (5 times)</button>
+                    <div id="loopOutput" style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;"></div>
+                </div>`,
+                demoJS: function() {
+                    window.runLoop = function() {
+                        const output = document.getElementById('loopOutput');
+                        output.innerHTML = '';
+                        for (let i = 1; i <= 5; i++) {
+                            const box = document.createElement('div');
+                            box.style.background = 'rgba(167,139,250,0.2)';
+                            box.style.padding = '0.8rem 1.2rem';
+                            box.style.borderRadius = '8px';
+                            box.style.border = '1px solid rgba(167,139,250,0.2)';
+                            box.style.animation = 'fadeIn 0.3s ease';
+                            box.textContent = `🔁 Count: ${i}`;
+                            output.appendChild(box);
+                        }
+                        alert('🔁 Loop completed! Check the boxes above.');
+                    };
+                }
+            },
+
+            button: {
+                name: 'Button',
+                category: 'html',
+                icon: '🔘',
+                explanation: 'A button is a <strong>clickable element</strong> that triggers an action. It\'s how users interact with your page.',
+                analogy: 'Like a doorbell – you press it, and something happens.',
+                code: `&lt;!-- Basic button --&gt;\n&lt;button&gt;Click Me&lt;/button&gt;\n\n&lt;!-- Button with click action --&gt;\n&lt;button <span class="keyword">onclick</span>=<span class="string">"alert('Hello!')"</span>&gt;Say Hello&lt;/button&gt;\n\n&lt;!-- Button as a link --&gt;\n&lt;button <span class="keyword">onclick</span>=<span class="string">"location.href='page.html'"</span>&gt;Go to Page&lt;/button&gt;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+                    <button onclick="alert('🔘 Button clicked!')" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.8rem 2rem; border-radius:40px; font-weight:600; cursor:pointer; font-size:1rem;">🔘 Click Me</button>
+                    <button onclick="this.textContent='✓ Clicked!'; this.style.background='rgb(52,211,153)';" style="background:rgba(96,165,250,0.3); border:1px solid rgb(96,165,250); color:rgb(240,244,255); padding:0.8rem 2rem; border-radius:40px; cursor:pointer; font-size:1rem; transition:0.3s;">🔘 Change Me</button>
+                    <button onclick="location.href='index.html'" style="background:rgba(251,191,36,0.2); border:1px solid rgb(251,191,36); color:rgb(240,244,255); padding:0.8rem 2rem; border-radius:40px; cursor:pointer; font-size:1rem;">🔘 Go Home</button>
+                </div>`
+            },
+
+            input: {
+                name: 'Input',
+                category: 'html',
+                icon: '✍️',
+                explanation: 'Input is a field where users can <strong>type text, numbers, or select options</strong>. It\'s how you collect data from users.',
+                analogy: 'Like a form you fill out – you write information in boxes.',
+                code: `&lt;!-- Text input --&gt;\n&lt;input <span class="keyword">type</span>=<span class="string">"text"</span> <span class="keyword">placeholder</span>=<span class="string">"Enter your name"</span>&gt;\n\n&lt;!-- Number input --&gt;\n&lt;input <span class="keyword">type</span>=<span class="string">"number"</span> <span class="keyword">min</span>=<span class="string">"0"</span> <span class="keyword">max</span>=<span class="string">"100"</span>&gt;\n\n&lt;!-- Password input --&gt;\n&lt;input <span class="keyword">type</span>=<span class="string">"password"</span> <span class="keyword">placeholder</span>=<span class="string">"Enter password"</span>&gt;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; display:flex; flex-direction:column; align-items:center; gap:1rem;">
+                    <label style="width:100%; max-width:300px; display:flex; flex-direction:column; gap:0.3rem; color:rgb(148,163,184);">
+                        Enter your name:
+                        <input type="text" id="nameInput" placeholder="Type your name..." style="padding:0.8rem 1.2rem; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.3); color:rgb(240,244,255); font-size:1rem;">
+                    </label>
+                    <button onclick="showInput()" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.6rem 1.8rem; border-radius:40px; font-weight:600; cursor:pointer;">Submit</button>
+                    <div id="inputDisplay" style="min-height:30px; color:rgb(196,181,253);"></div>
+                </div>`,
+                demoJS: function() {
+                    window.showInput = function() {
+                        const name = document.getElementById('nameInput').value;
+                        if (name.trim()) {
+                            document.getElementById('inputDisplay').textContent = `👋 Hello, ${name}! Nice to meet you!`;
+                        } else {
+                            document.getElementById('inputDisplay').textContent = '✍️ Please type something first!';
+                        }
+                    };
+                }
+            },
+
+            'z-index': {
+                name: 'z-index',
+                category: 'css',
+                icon: '📚',
+                explanation: 'z-index controls the <strong>stack order</strong> of overlapping elements. Higher z-index = closer to the viewer (on top).',
+                analogy: 'Like a stack of books – the one with the highest number on top is the one you see first.',
+                code: `/* Element with higher z-index appears on top */\n<span class="property">z-index</span>: <span class="number">1</span>; <span class="comment">/* Lower layer */</span>\n<span class="property">z-index</span>: <span class="number">10</span>; <span class="comment">/* Higher layer (on top) */</span>`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; position:relative; min-height:200px;">
+                    <div style="position:absolute; top:40px; left:30px; background:rgba(167,139,250,0.5); padding:1rem 2rem; border-radius:8px; z-index:1;">
+                        🔵 z-index: 1 (bottom)
+                    </div>
+                    <div style="position:absolute; top:20px; left:50px; background:rgba(96,165,250,0.5); padding:1rem 2rem; border-radius:8px; z-index:10;">
+                        🔷 z-index: 10 (middle)
+                    </div>
+                    <div style="position:absolute; top:10px; left:70px; background:rgba(52,211,153,0.5); padding:1rem 2rem; border-radius:8px; z-index:100;">
+                        🟢 z-index: 100 (top!)
+                    </div>
+                    <p style="position:relative; padding-top:120px; color:rgb(148,163,184); font-size:0.85rem;">Higher z-index = closer to you 👆</p>
+                </div>`
+            },
+
+            position: {
+                name: 'Position',
+                category: 'css',
+                icon: '📍',
+                explanation: 'Position determines <strong>where</strong> an element is placed on the page. Different types: static, relative, absolute, fixed, sticky.',
+                analogy: 'Like placing furniture in a room – you can put it in one spot, or move it around relative to other things.',
+                code: `/* Static (default) - flows with the page */\n<span class="property">position</span>: <span class="keyword">static</span>;\n\n/* Relative - position relative to its normal spot */\n<span class="property">position</span>: <span class="keyword">relative</span>;\n<span class="property">top</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Absolute - position relative to nearest positioned ancestor */\n<span class="property">position</span>: <span class="keyword">absolute</span>;\n<span class="property">top</span>: <span class="number">10</span><span class="number">px</span>;\n<span class="property">left</span>: <span class="number">20</span><span class="number">px</span>;\n\n/* Fixed - position relative to the viewport (stays in place) */\n<span class="property">position</span>: <span class="keyword">fixed</span>;\n<span class="property">top</span>: <span class="number">0</span>;\n\n/* Sticky - hybrid of relative and fixed */\n<span class="property">position</span>: <span class="keyword">sticky</span>;\n<span class="property">top</span>: <span class="number">0</span>;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px;">
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+                        <div style="background:rgba(167,139,250,0.3); padding:0.8rem 1.2rem; border-radius:8px;">Static</div>
+                        <div style="background:rgba(96,165,250,0.3); padding:0.8rem 1.2rem; border-radius:8px; position:relative; top:10px; left:10px;">Relative</div>
+                        <div style="background:rgba(52,211,153,0.3); padding:0.8rem 1.2rem; border-radius:8px; position:relative; top:20px; left:20px;">Relative</div>
+                    </div>
+                    <p style="text-align:center; color:rgb(148,163,184); font-size:0.85rem; margin-top:0.5rem;">The two "Relative" boxes are shifted from their normal spot.</p>
+                </div>`
+            },
+
+            'box-shadow': {
+                name: 'Box Shadow',
+                category: 'css',
+                icon: '🌓',
+                explanation: 'Box-shadow adds a <strong>shadow effect</strong> around an element, making it look like it\'s floating or 3D.',
+                analogy: 'Like the shadow your hand makes on a desk – it adds depth and makes things look more real.',
+                code: `/* Simple shadow */\n<span class="property">box-shadow</span>: <span class="number">0</span> <span class="number">4</span><span class="number">px</span> <span class="number">14</span><span class="number">px</span> rgba(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.3</span>);\n\n/* Larger, more spread shadow */\n<span class="property">box-shadow</span>: <span class="number">0</span> <span class="number">10</span><span class="number">px</span> <span class="number">30</span><span class="number">px</span> rgba(<span class="number">79</span>,<span class="number">70</span>,<span class="number">229</span>,<span class="number">0.4</span>);\n\n/* Inner shadow (inset) */\n<span class="property">box-shadow</span>: <span class="keyword">inset</span> <span class="number">0</span> <span class="number">2</span><span class="number">px</span> <span class="number">10</span><span class="number">px</span> rgba(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.5</span>);`,
+                demoHTML: `<div class="example-container">
+                    <div id="shadowTarget" style="background:rgba(167,139,250,0.2); padding:2rem; border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,0.3); transition:all 0.3s;">
+                        <strong>Box Shadow</strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">Shadow changes below ⬇️</p>
+                    </div>
+                </div>
+                <div class="controls">
+                    <label>
+                        Blur: <span class="value-display" id="shadowBlurDisplay">14</span>px
+                        <input type="range" min="0" max="50" value="14" id="shadowBlur" oninput="updateShadow()">
+                    </label>
+                    <label>
+                        Opacity: <span class="value-display" id="shadowOpacityDisplay">0.3</span>
+                        <input type="range" min="0" max="1" step="0.05" value="0.3" id="shadowOpacity" oninput="updateShadow()">
+                    </label>
+                </div>`,
+                demoJS: function() {
+                    window.updateShadow = function() {
+                        const blur = document.getElementById('shadowBlur').value;
+                        const opacity = document.getElementById('shadowOpacity').value;
+                        document.getElementById('shadowTarget').style.boxShadow = `0 4px ${blur}px rgba(0,0,0,${opacity})`;
+                        document.getElementById('shadowBlurDisplay').textContent = blur;
+                        document.getElementById('shadowOpacityDisplay').textContent = opacity;
+                    };
+                }
+            },
+
+            display: {
+                name: 'Display',
+                category: 'css',
+                icon: '👁️',
+                explanation: 'Display controls <strong>how an element is shown</strong> – block, inline, flex, grid, or hidden. It\'s the fundamental layout property.',
+                analogy: 'Like choosing how to arrange items – on a shelf (flex), in a grid (grid), or as a single line (inline).',
+                code: `/* Block - takes full width, forces new line */\n<span class="property">display</span>: <span class="keyword">block</span>;\n\n/* Inline - only takes as much width as needed */\n<span class="property">display</span>: <span class="keyword">inline</span>;\n\n/* Flex - flexible layout in one direction */\n<span class="property">display</span>: <span class="keyword">flex</span>;\n\n/* Grid - two-dimensional layout */\n<span class="property">display</span>: <span class="keyword">grid</span>;\n\n/* None - element is hidden */\n<span class="property">display</span>: <span class="keyword">none</span>;\n\n/* Inline-block - inline but with block properties */\n<span class="property">display</span>: <span class="keyword">inline-block</span>;`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px;">
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin-bottom:1rem;">
+                        <button onclick="setDisplay('block')" style="background:rgba(167,139,250,0.2); border:1px solid rgb(167,139,250); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">Block</button>
+                        <button onclick="setDisplay('inline-block')" style="background:rgba(96,165,250,0.2); border:1px solid rgb(96,165,250); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">Inline-Block</button>
+                        <button onclick="setDisplay('none')" style="background:rgba(248,113,113,0.2); border:1px solid rgb(248,113,113); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">None (Hide)</button>
+                        <button onclick="setDisplay('flex')" style="background:rgba(52,211,153,0.2); border:1px solid rgb(52,211,153); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">Flex</button>
+                    </div>
+                    <div id="displayTarget" style="background:rgba(167,139,250,0.2); padding:1rem; border-radius:8px; display:block; transition:all 0.3s;">
+                        <strong>Display: <span id="displayType">block</span></strong>
+                        <p style="margin:0.3rem 0 0; font-size:0.85rem; color:rgb(148,163,184);">This box changes display mode.</p>
+                    </div>
+                    <p style="text-align:center; color:rgb(148,163,184); font-size:0.85rem; margin-top:0.5rem;">Click a button to change the display property!</p>
+                </div>`,
+                demoJS: function() {
+                    window.setDisplay = function(value) {
+                        const target = document.getElementById('displayTarget');
+                        target.style.display = value;
+                        document.getElementById('displayType').textContent = value;
+                        if (value === 'none') {
+                            target.style.background = 'rgba(248,113,113,0.1)';
+                            target.style.border = '1px solid rgb(248,113,113)';
+                            alert('👻 The box is hidden! Click "Block" to bring it back.');
+                        } else {
+                            target.style.background = 'rgba(167,139,250,0.2)';
+                            target.style.border = 'none';
+                        }
+                    };
+                }
+            },
+
+            array: {
+                name: 'Array',
+                category: 'js',
+                icon: '📋',
+                explanation: 'An array is a <strong>list of items</strong> stored in a single variable. You can access each item by its index (position).',
+                analogy: 'Like a shopping list – you have multiple items in one list, and you can pick the first, second, or last item.',
+                code: `<span class="comment">// Create an array</span>\n<span class="keyword">let</span> fruits = [<span class="string">'apple'</span>, <span class="string">'banana'</span>, <span class="string">'orange'</span>];\n\n<span class="comment">// Access items (index starts at 0)</span>\n<span class="function">console</span>.<span class="function">log</span>(fruits[<span class="number">0</span>]); <span class="comment">// 'apple'</span>\n<span class="function">console</span>.<span class="function">log</span>(fruits[<span class="number">1</span>]); <span class="comment">// 'banana'</span>\n\n<span class="comment">// Add items</span>\nfruits.<span class="function">push</span>(<span class="string">'grape'</span>); <span class="comment">// Add to end</span>\nfruits.<span class="function">pop</span>(); <span class="comment">// Remove last item</span>\n\n<span class="comment">// Loop through all items</span>\n<span class="keyword">for</span> (<span class="keyword">let</span> fruit <span class="keyword">of</span> fruits) {\n  <span class="function">console</span>.<span class="function">log</span>(fruit);\n}`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px;">
+                    <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; margin-bottom:1rem;" id="arrayDisplay">
+                        <div style="background:rgba(167,139,250,0.3); padding:0.5rem 1rem; border-radius:8px;">🍎 Apple</div>
+                        <div style="background:rgba(96,165,250,0.3); padding:0.5rem 1rem; border-radius:8px;">🍌 Banana</div>
+                        <div style="background:rgba(52,211,153,0.3); padding:0.5rem 1rem; border-radius:8px;">🍊 Orange</div>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="addFruit()" style="background:rgba(52,211,153,0.2); border:1px solid rgb(52,211,153); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">➕ Add Fruit</button>
+                        <button onclick="removeFruit()" style="background:rgba(248,113,113,0.2); border:1px solid rgb(248,113,113); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">➖ Remove Last</button>
+                        <button onclick="showFruits()" style="background:rgba(167,139,250,0.2); border:1px solid rgb(167,139,250); color:rgb(240,244,255); padding:0.4rem 1.2rem; border-radius:40px; cursor:pointer;">📋 Show All</button>
+                    </div>
+                    <p id="arrayMessage" style="text-align:center; color:rgb(196,181,253); margin-top:0.5rem; min-height:20px;"></p>
+                </div>`,
+                demoJS: function() {
+                    let fruits = ['🍎 Apple', '🍌 Banana', '🍊 Orange'];
+                    const emojis = ['🍇 Grape', '🍓 Strawberry', '🍉 Watermelon', '🥝 Kiwi', '🍑 Peach', '🍒 Cherry', '🍋 Lemon', '🍐 Pear'];
+
+                    function updateArrayDisplay() {
+                        const container = document.getElementById('arrayDisplay');
+                        container.innerHTML = '';
+                        fruits.forEach((fruit, index) => {
+                            const div = document.createElement('div');
+                            div.style.background = ['rgba(167,139,250,0.3)', 'rgba(96,165,250,0.3)', 'rgba(52,211,153,0.3)', 'rgba(251,191,36,0.3)', 'rgba(248,113,113,0.3)'][index % 5];
+                            div.style.padding = '0.5rem 1rem';
+                            div.style.borderRadius = '8px';
+                            div.style.border = '1px solid rgba(255,255,255,0.05)';
+                            div.textContent = fruit;
+                            container.appendChild(div);
+                        });
+                    }
+
+                    window.addFruit = function() {
+                        const fruit = emojis[Math.floor(Math.random() * emojis.length)];
+                        fruits.push(fruit);
+                        updateArrayDisplay();
+                        document.getElementById('arrayMessage').textContent = `➕ Added "${fruit}" to the array! (Total: ${fruits.length})`;
+                    };
+
+                    window.removeFruit = function() {
+                        if (fruits.length > 0) {
+                            const removed = fruits.pop();
+                            updateArrayDisplay();
+                            document.getElementById('arrayMessage').textContent = `➖ Removed "${removed}" from the array. (Total: ${fruits.length})`;
+                        } else {
+                            document.getElementById('arrayMessage').textContent = '❌ Array is empty! Add some fruits first.';
+                        }
+                    };
+
+                    window.showFruits = function() {
+                        let list = '📋 Your Fruit Array:\n\n';
+                        fruits.forEach((fruit, index) => {
+                            list += `  ${index + 1}. ${fruit}\n`;
+                        });
+                        list += `\nTotal: ${fruits.length} items`;
+                        alert(list);
+                    };
+                }
+            },
+
+            object: {
+                name: 'Object',
+                category: 'js',
+                icon: '🧩',
+                explanation: 'An object is a <strong>collection of properties</strong> (key-value pairs). It groups related data together like a real-world entity.',
+                analogy: 'Like a person – they have a name, age, and job. Each piece of information is a property of that person.',
+                code: `<span class="comment">// Create an object</span>\n<span class="keyword">let</span> person = {\n  <span class="property">name</span>: <span class="string">"Alice"</span>,\n  <span class="property">age</span>: <span class="number">25</span>,\n  <span class="property">isStudent</span>: <span class="keyword">true</span>,\n  <span class="property">greet</span>: <span class="keyword">function</span>() {\n    <span class="keyword">return</span> <span class="string">"Hello, I'm "</span> + <span class="keyword">this</span>.name;\n  }\n};\n\n<span class="comment">// Access properties</span>\n<span class="function">console</span>.<span class="function">log</span>(person.name); <span class="comment">// "Alice"</span>\n<span class="function">console</span>.<span class="function">log</span>(person.age);  <span class="comment">// 25</span>\n\n<span class="comment">// Call a method</span>\nperson.<span class="function">greet</span>(); <span class="comment">// "Hello, I'm Alice"</span>`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px;">
+                    <div style="background:rgba(0,0,0,0.3); padding:1rem; border-radius:8px; margin-bottom:1rem; text-align:center;">
+                        <div id="objectDisplay">
+                            <p><strong>🧑 Person Object</strong></p>
+                            <p style="color:rgb(196,181,253);">name: <span id="objName">Alice</span></p>
+                            <p style="color:rgb(96,165,250);">age: <span id="objAge">25</span></p>
+                            <p style="color:rgb(52,211,153);">isStudent: <span id="objStudent">true</span></p>
+                            <p style="color:rgb(251,191,36);">job: <span id="objJob">Developer</span></p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="changeObject()" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.5rem 1.8rem; border-radius:40px; cursor:pointer; font-weight:600;">🔄 Change Object</button>
+                        <button onclick="showObject()" style="background:rgba(167,139,250,0.2); border:1px solid rgb(167,139,250); color:rgb(240,244,255); padding:0.5rem 1.8rem; border-radius:40px; cursor:pointer;">📋 Show Object</button>
+                    </div>
+                    <p id="objectMessage" style="text-align:center; color:rgb(148,163,184); margin-top:0.5rem; min-height:20px;"></p>
+                </div>`,
+                demoJS: function() {
+                    let person = {
+                        name: 'Alice',
+                        age: 25,
+                        isStudent: true,
+                        job: 'Developer'
+                    };
+
+                    const names = ['Alice', 'Bob', 'Charlie', 'Diana', 'Eva', 'Frank'];
+                    const jobs = ['Developer', 'Designer', 'Teacher', 'Engineer', 'Doctor', 'Artist'];
+
+                    window.changeObject = function() {
+                        person.name = names[Math.floor(Math.random() * names.length)];
+                        person.age = Math.floor(Math.random() * 30) + 18;
+                        person.isStudent = Math.random() > 0.5;
+                        person.job = jobs[Math.floor(Math.random() * jobs.length)];
+
+                        document.getElementById('objName').textContent = person.name;
+                        document.getElementById('objAge').textContent = person.age;
+                        document.getElementById('objStudent').textContent = person.isStudent;
+                        document.getElementById('objJob').textContent = person.job;
+
+                        document.getElementById('objectMessage').textContent = `✅ Object updated! ${person.name} is ${person.age} years old.`;
+                    };
+
+                    window.showObject = function() {
+                        alert(`🧑 Person Object:\n\nName: ${person.name}\nAge: ${person.age}\nStudent: ${person.isStudent}\nJob: ${person.job}`);
+                    };
+                }
+            },
+
+            alert: {
+                name: 'Alert',
+                category: 'js',
+                icon: '💬',
+                explanation: 'Alert is a pop-up box that shows a <strong>message to the user</strong>. It interrupts everything until the user clicks "OK".',
+                analogy: 'Like someone tapping you on the shoulder to get your attention – it stops everything until you acknowledge it.',
+                code: `// Show a simple message\n<span class="function">alert</span>(<span class="string">"Hello, World!"</span>);\n\n// Show with variables\n<span class="keyword">let</span> name = <span class="string">"Mate"</span>;\n<span class="function">alert</span>(<span class="string">"Welcome, "</span> + name + <span class="string">"!"</span>);\n\n// Show with line breaks\n<span class="function">alert</span>(<span class="string">"Line 1\\nLine 2\\nLine 3"</span>);`,
+                demoHTML: `<div style="background:rgba(167,139,250,0.1); padding:1.5rem; border-radius:12px; text-align:center;">
+                    <div style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;">
+                        <button onclick="alert('💬 Hello, Mate!')" style="background:linear-gradient(135deg, rgb(124,58,237), rgb(79,70,229)); border:none; color:white; padding:0.8rem 2rem; border-radius:40px; font-weight:600; cursor:pointer;">💬 Simple Alert</button>
+                        <button onclick="alert('👋 Welcome to the Coding Dictionary!\n\nThis is a multi-line alert.\n\nClick OK to continue.')" style="background:rgba(96,165,250,0.3); border:1px solid rgb(96,165,250); color:rgb(240,244,255); padding:0.8rem 2rem; border-radius:40px; cursor:pointer;">📝 Multi-Line Alert</button>
+                        <button onclick="dynamicAlert()" style="background:rgba(52,211,153,0.3); border:1px solid rgb(52,211,153); color:rgb(240,244,255); padding:0.8rem 2rem; border-radius:40px; cursor:pointer;">🎯 Dynamic Alert</button>
+                    </div>
+                    <p style="color:rgb(148,163,184); margin-top:0.8rem; font-size:0.85rem;">Click a button to see the alert in action!</p>
+                </div>`,
+                demoJS: function() {
+                    window.dynamicAlert = function() {
+                        const messages = [
+                            '🎯 You clicked a button!',
+                            '✨ This alert was generated by JavaScript!',
+                            '💡 You\'re learning how alerts work!',
+                            '🚀 Keep clicking to see more alerts!',
+                            '🎉 You\'re doing great, mate!'
+                        ];
+                        const message = messages[Math.floor(Math.random() * messages.length)];
+                        alert(`💬 Dynamic Alert\n\n${message}\n\nClick OK to dismiss.`);
+                    };
+                }
+            }
+        };
+
+        // ---------- DEMO CARD FUNCTIONS ----------
+        function openDemo(conceptKey) {
+            const concept = concepts[conceptKey];
+            if (!concept) return;
+
+            const demoCard = document.getElementById('demoCard');
+            const demoTitle = document.getElementById('demoTitle');
+            const demoContent = document.getElementById('demoContent');
+
+            // Set title
+            demoTitle.textContent = `${concept.icon || '📚'} ${concept.name}`;
+
+            // Build content
+            let html = `
+                <div class="explanation">${concept.explanation}</div>
+                <div class="analogy">💡 ${concept.analogy}</div>
+                <div class="code-block">${concept.code}</div>
+            `;
+
+            if (concept.demoHTML) {
+                html += `<div class="demo-box">${concept.demoHTML}</div>`;
+            }
+
+            demoContent.innerHTML = html;
+
+            // Run demo JS if it exists
+            if (concept.demoJS) {
+                concept.demoJS();
+                // Call any init functions
+                if (window.updateMargin) { /* just to ensure functions are registered */ }
+            }
+
+            // Show the card
+            demoCard.classList.add('active');
+
+            // Scroll to it smoothly
+            demoCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function closeDemo() {
+            document.getElementById('demoCard').classList.remove('active');
+        }
+
+        // ---------- CONCEPT BUTTON CLICKS ----------
+        document.querySelectorAll('.concept-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const conceptKey = this.dataset.concept;
+                openDemo(conceptKey);
+            });
+        });
+
+        // ---------- CATEGORY FILTER ----------
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Update active tab
+                document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const category = this.dataset.category;
+
+                // Show/hide concept buttons
+                document.querySelectorAll('.concept-btn').forEach(btn => {
+                    if (category === 'all' || btn.dataset.category === category) {
+                        btn.style.display = 'flex';
+                    } else {
+                        btn.style.display = 'none';
+                    }
+                });
+
+                // Close demo when switching categories
+                closeDemo();
+            });
+        });
+
+        console.log('📚 Interactive Coding Dictionary is ready!');
+    </script>
+
+</body>
+</html>
