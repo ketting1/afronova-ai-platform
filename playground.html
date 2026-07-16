@@ -1,17 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Playground</title>
-</head>
-<body>
-    <h1>Playground is working!</h1>
-    <p>If you see this, the file is live!</p>
-    <a href="index.html">Back to Home</a>
-</body>
-</html>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Playground</title>
 
     <style>
-        /* ---------- SAME STYLE ---------- */
+        /* ---------- RESET & BASE ---------- */
         html, body {
             margin: 0;
             padding: 0;
@@ -218,12 +213,6 @@
             color: rgb(240, 244, 255);
         }
 
-        .example-btn .tag {
-            font-size: 0.65rem;
-            color: rgb(100, 116, 139);
-            margin-left: 0.3rem;
-        }
-
         /* ---------- RESPONSIVE ---------- */
         @media (max-width: 768px) {
             .playground-container {
@@ -252,7 +241,6 @@
     <div class="main-wrapper">
 
         <a href="index.html" class="back-button">← Back to Explorer</a>
-        
 
         <div class="page-header">
             <h1>💻 Code Playground</h1>
@@ -360,10 +348,8 @@
             const code = document.getElementById('codeEditor').value;
             const iframe = document.getElementById('previewFrame');
 
-            // Build full HTML document from the code
             let fullDoc = code;
 
-            // If the code doesn't have <html> or <body> tags, wrap it
             if (!code.includes('<html') && !code.includes('<body')) {
                 fullDoc = `
 <!DOCTYPE html>
