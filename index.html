@@ -223,6 +223,62 @@
             color: rgb(100, 116, 139);
             margin-top: 0.3rem;
         }
+        /* ---------- CHAT STYLES ---------- */
+.chat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    overflow-y: auto;
+    max-height: 300px;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    min-height: 150px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chat-box::-webkit-scrollbar {
+    width: 4px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.3);
+    border-radius: 10px;
+}
+
+/* ---------- INSTRUCTION BOX ---------- */
+.instruction-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 1.2rem;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    color: rgb(148, 163, 184);
+    font-size: 0.9rem;
+    text-align: center;
+    margin-top: 0.5rem;
+    min-height: 80px;
+    transition: all 0.3s;
+    overflow: hidden;
+}
+
+.instruction-box::-webkit-scrollbar {
+    width: 4px;
+}
+
+.instruction-box::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.instruction-box::-webkit-scrollbar-thumb {
+    background: rgba(167, 139, 250, 0.3);
+    border-radius: 10px;
+}
 
         .disclaimer {
             background: rgba(239, 68, 68, 0.08);
