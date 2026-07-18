@@ -239,7 +239,269 @@ function setupChat() {
         </span>
     `;
     chatBox.appendChild(welcomeMsg);
+    
+// ============================================================
+// AGENT INSTRUCTIONS GENERATOR
+// ============================================================
 
+function generateAgentInstructions() {
+    // Get the instruction box where we'll show the result
+    const instructionBox = document.querySelector('.instruction-box');
+    
+    // Show loading state
+    instructionBox.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+            <div style="font-size: 2rem;">⚙️</div>
+            <div style="color: rgb(196, 181, 253); font-weight: 600;">Generating AI instructions...</div>
+            <div style="font-size: 0.85rem; color: rgb(100, 116, 139);">Please wait while we prepare your onboarding guide</div>
+            <div style="width: 100%; max-width: 200px; height: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; margin-top: 0.5rem;">
+                <div id="loadingBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, rgb(167,139,250), rgb(96,165,250)); border-radius: 4px; transition: width 0.3s;"></div>
+            </div>
+        </div>
+    `;
+
+    // Animate loading bar
+    let progress = 0;
+    const loadingInterval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress > 90) progress = 90;
+        const bar = document.getElementById('loadingBar');
+        if (bar) bar.style.width = progress + '%';
+    }, 200);
+
+    // Call AI to generate instructions
+    getAIInstructions()
+        .then(response => {
+            clearInterval(loadingInterval);
+            const bar = document.getElementById('loadingBar');
+            if (bar) bar.style.width = '100%';
+            
+            // Show the result after a small delay for effect
+            setTimeout(() => {
+                instructionBox.innerHTML = `
+                    <div style="text-align: left; max-height: 300px; overflow-y: auto; padding-right: 0.5rem;">
+                        <div style="color: rgb(74, 222, 128); font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            ✅ <span>Instructions Generated Successfully!</span>
+                        </div>
+                        <div style="color: rgb(203, 213, 225); font-size: 0.9rem; line-height: 1.8; white-space: pre-wrap;">
+                            ${response}
+                        </div>
+                        <button onclick="copyInstructions()" style="
+                            margin-top: 1rem;
+                            padding: 0.5rem 1.5rem;
+                            border-radius: 40px;
+                            border: none;
+                            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
+                            color: white;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.3s;
+                            font-size: 0.85rem;
+                        " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                            📋 Copy Instructions
+                        </button>
+                    </div>
+                `;
+                document.querySelector('.instruction-hint')?.remove();
+            }, 500);
+        })
+        .catch(error => {
+            clearInterval(loadingInterval);
+            instructionBox.innerHTML = `
+                <div style="color: rgb(248, 113, 113);">
+                    ❌ Error generating instructions: ${error.message}
+                </div>
+                <button onclick="generateAgentInstructions()" style="
+                    margin-top: 1rem;
+                    padding: 0.5rem 1.5rem;
+                    border-radius: 40px;
+                    border: 1px solid rgb(248, 113, 113);
+                    background: transparent;
+                    color: rgb(248, 113, 113);
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                " onmouseover="this.style.background='rgba(248,113,113,0.1)'" onmouseout="this.style.background='transparent'">
+                    Try Again
+                </button>
+            `;
+        });
+}
+
+// ---------- GET AI INSTRUCTIONS ----------
+async function getAIInstructions() {
+    try {
+        // This is a free public AI API for demo purposes
+        // In production, you'd use your own API key
+        const response = await fetch('https://api.gaianet.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                messages: [
+                    {
+                        role: 'system',
+                        content: `You are an AI onboarding expert. Generate a step-by-step guide for onboarding AI onto a codebase. 
+                        
+                        The user has built a website called "AfroNova AI" with:
+                        - HTML, CSS, and JavaScript
+                        - A starfield animation
+                        - Lesson cards
+                        - A chat interface
+                        
+                        Provide clear, actionable instructions. Use bullet points. Keep it under 300 words.`
+                    },
+                    {
+                        role: 'user',
+                        content: 'Please generate instructions for onboarding AI onto my AfroNova AI codebase. Include steps for integration, best practices, and next steps.'
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 500
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('AI service is busy. Please try again.');
+        }
+
+        const data = await response.json();
+        
+        // Extract the response
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            return data.choices[0].message.content;
+        } else if (data.response) {
+            return data.response;
+        } else {
+            return getFallbackInstructions();
+        }
+
+    } catch (error) {
+        console.error('AI Error:', error);
+        return getFallbackInstructions();
+    }
+}
+
+// ---------- FALLBACK INSTRUCTIONS ----------
+function getFallbackInstructions() {
+    return `📋 **AI Onboarding Instructions for AfroNova AI**
+
+**Step 1: Analyse Your Codebase**
+• Review your HTML structure (index.html, lesson pages)
+• Check your CSS styling and layout
+• Understand your JavaScript functions
+
+**Step 2: Prepare Your AI Integration**
+• Choose an AI provider (OpenAI, Mistral, or local LLM)
+• Get your API key and keep it secure
+• Test with simple prompts first
+
+**Step 3: Integrate AI Services**
+• Add the AI API to your chat.js file
+• Create a backend proxy if needed (for security)
+• Test with sample messages
+
+**Step 4: Best Practices**
+• Always show loading states
+• Handle errors gracefully
+• Limit user input length
+• Cache responses when possible
+
+**Step 5: Next Steps**
+• Add more AI features (code suggestions, answers)
+• User authentication
+• Track usage and improve prompts
+
+**🎯 Your AI journey starts now! Keep building and learning!**`;
+}
+
+// ---------- COPY INSTRUCTIONS ----------
+function copyInstructions() {
+    const instructionBox = document.querySelector('.instruction-box');
+    const text = instructionBox.textContent.replace('📋 Copy Instructions', '').trim();
+    
+    // Use clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                showToast('📋 Instructions copied to clipboard!');
+            })
+            .catch(() => {
+                // Fallback
+                copyToClipboardFallback(text);
+            });
+    } else {
+        // Fallback for older browsers
+        copyToClipboardFallback(text);
+    }
+}
+
+// ---------- COPY TO CLIPBOARD FALLBACK ----------
+function copyToClipboardFallback(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.top = '-1000px';
+    textarea.style.left = '-1000px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showToast('📋 Instructions copied to clipboard!');
+    } catch (err) {
+        showToast('❌ Could not copy. Please select and copy manually.');
+    }
+    document.body.removeChild(textarea);
+}
+
+// ---------- TOAST NOTIFICATION ----------
+function showToast(message) {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast-message');
+    if (existingToast) existingToast.remove();
+
+    const toast = document.createElement('div');
+    toast.className = 'toast-message';
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(11, 14, 30, 0.95);
+        color: rgb(240, 244, 255);
+        padding: 1rem 2rem;
+        border-radius: 60px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(12px);
+        z-index: 9999;
+        font-size: 1rem;
+        font-weight: 600;
+        animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Add animation styles
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes fadeOut {
+        to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    }
+`;
+document.head.appendChild(styleSheet);
+
+console.log('🤖 Agent instructions module loaded!');
     console.log('💬 Chat is ready!');
 }
 
