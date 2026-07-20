@@ -1,1 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lesson 3 - Building Your First AI Website</title>
 
+    <style>
+        /* ---------- SAME STYLE AS LESSON 1 ---------- */
+        html, body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: rgb(11, 14, 26);
+            color: rgb(240, 244, 255);
+            min-height: 100vh;
+            padding: 1.5rem 1rem 0;
+            overflow-x: hidden;
+        }
+
+        [id="starfield"] {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            display: block;
+        }
+
+        .main-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgb(167, 139, 250);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 2rem;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: rgb(196, 181, 253);
+        }
+
+        .lesson-content {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            padding: 3rem 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 3rem;
+        }
+
+        .lesson-content h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250), rgb(52, 211, 153));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content .subtitle {
+            color: rgb(148, 163, 184);
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 1.5rem;
+        }
+
+        .lesson-content h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: rgb(238, 242, 255);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: rgb(196, 181, 253);
+            margin-top: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .lesson-content p {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content ul {
+            color: rgb(203, 213, 225);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(167, 139, 250, 0.06);
+            border-left: 4px solid rgb(167, 139, 250);
+            padding: 1.2rem 1.8rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box strong {
+            color: rgb(196, 181, 253);
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgb(203, 213, 225);
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin: 1.5rem 0;
+        }
+
+        .code-block .comment {
+            color: rgb(100, 116, 139);
+        }
+        .code-block .keyword {
+            color: rgb(167, 139, 250);
+        }
+        .code-block .string {
+            color: rgb(74, 222, 128);
+        }
+        .code-block .function {
+            color: rgb(96, 165, 250);
+        }
+        .code-block .number {
+            color: rgb(251, 191, 36);
+        }
+
+        .complete-btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border-radius: 60px;
+            background: linear-gradient(135deg, rgb(124, 58, 237), rgb(79, 70, 229));
+            color: rgb(255, 255, 255);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 30px rgba(79, 70, 229, 0.3);
+            margin-top: 2rem;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(79, 70, 229, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .lesson-content {
+                padding: 2rem 1.2rem;
+            }
+            .lesson-content h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="starfield"></canvas>
+
+    <div class="main-wrapper">
+
+        <a href="index.html" class="back-button">← Back to Explorer</a>
+
+        <div class="lesson-content">
+
+            <h1>🌐 Lesson 3: Building Your First AI Website</h1>
+            <div class="subtitle">Take your website from static to smart with AI</div>
+
+            <h2>🤔 What is an AI-Powered Website?</h2>
+            <p>
+                An AI-powered website is a normal website that can <strong>think, learn, and respond</strong> like a human. 
+                Instead of just showing static information, it can <strong>talk to users</strong>, <strong>answer questions</strong>, 
+                and even <strong>generate content</strong>.
+            </p>
+
+            <div class="highlight-box">
+                <p><strong>💡 Real-world example:</strong> You just built one! Your chat box and "Generate Instructions" button are powered by AI.</p>
+            </div>
+
+            <h2>🔧 Step 1: Choose Your AI Provider</h2>
+            <p>There are many AI providers you can use:</p>
+            <ul>
+                <li><strong>OpenAI</strong> – The most popular (ChatGPT, GPT-4)</li>
+                <li><strong>Mistral AI</strong> – Open-source and powerful</li>
+                <li><strong>Google Gemini</strong> – Google's AI</li>
+                <li><strong>Claude</strong> – Anthropic's AI</li>
+                <li><strong>Local LLM</strong> – Run on your own computer (free!)</li>
+            </ul>
+
+            <h2>📡 Step 2: Connect to an AI API</h2>
+            <p>
+                An API is like a <strong>phone line</strong> between your website and the AI. Your website sends a message, 
+                the AI thinks about it, and sends a response back.
+            </p>
+
+            <div class="code-block">
+                <span class="comment">// How to call an AI API</span>
+                <span class="keyword">async function</span> <span class="function">getAIResponse</span>(userMessage) {
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> response = <span class="keyword">await</span> <span class="function">fetch</span>(<span class="string">'https://api.ai-provider.com/v1/chat'</span>, {
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">method</span>: <span class="string">'POST'</span>,
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">headers</span>: { <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span> },
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">body</span>: <span class="function">JSON</span>.<span class="function">stringify</span>({
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;messages: [{ <span class="keyword">role</span>: <span class="string">'user'</span>, <span class="keyword">content</span>: userMessage }]
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;})
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;});
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="keyword">await</span> response.<span class="function">json</span>();
+                <br />
+                }
+            </div>
+
+            <h2>📝 Step 3: Write Your AI Logic</h2>
+            <p>
+                You already did this in your <code>chat.js</code> file! Your code:
+            </p>
+            <ul>
+                <li>Takes the user's message</li>
+                <li>Sends it to the AI</li>
+                <li>Shows the AI's response in the chat box</li>
+                <li>Handles errors if the AI is busy</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>🚀 Key insight:</strong> The AI doesn't know anything about your website. You have to <strong>tell it</strong> what your website is about using the <code>system</code> message.</p>
+            </div>
+
+            <h2>🎨 Step 4: Design Your UI</h2>
+            <p>
+                An AI website needs a good user interface. You've already built:
+            </p>
+            <ul>
+                <li><strong>Chat box</strong> – Where users type messages</li>
+                <li><strong>Message bubbles</strong> – User messages (right) and AI responses (left)</li>
+                <li><strong>Loading states</strong> – "AI is thinking..." indicator</li>
+                <li><strong>Action buttons</strong> – "Generate Instructions" and "Copy" buttons</li>
+            </ul>
+
+            <h2>⚡ Step 5: Test and Iterate</h2>
+            <ul>
+                <li><strong>Test different prompts:</strong> Try asking your AI different questions</li>
+                <li><strong>Handle edge cases:</strong> What if the AI is slow? What if it fails?</li>
+                <li><strong>Improve responses:</strong> Update the <code>system</code> message to get better answers</li>
+            </ul>
+
+            <h2>🌟 What You've Built</h2>
+            <p>
+                You've already built an AI-powered website! Let's recap what you did:
+            </p>
+            <ul>
+                <li>✅ Created a chat interface</li>
+                <li>✅ Connected to an AI API</li>
+                <li>✅ Sent messages and received responses</li>
+                <li>✅ Showed loading states</li>
+                <li>✅ Handled errors gracefully</li>
+                <li>✅ Generated AI instructions</li>
+                <li>✅ Copied responses to clipboard</li>
+            </ul>
+
+            <div class="highlight-box">
+                <p><strong>🎉 You did all of this!</strong> You're no longer just a coder – you're an AI developer!</p>
+            </div>
+
+            <h2>🚀 Next Steps</h2>
+            <ul>
+                <li><strong>Add more features:</strong> Save chat history, add voice input</li>
+                <li><strong>Improve your AI:</strong> Use a better system prompt</li>
+                <li><strong>Get an API key:</strong> Connect to OpenAI or Mistral for better responses</li>
+                <li><strong>Add authentication:</strong> Let users save their chats</li>
+            </ul>
+
+            <div style="text-align: center;">
+                <button class="complete-btn" onclick="completeLesson()">✅ I've Completed This Lesson</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // ---------- STARFIELD ----------
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let stars = [];
+
+        const STAR_COUNT = 200;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            createStars();
+        }
+
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < STAR_COUNT; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    radius: Math.random() * 1.5 + 0.3,
+                    speed: Math.random() * 0.8 + 0.2,
+                    opacity: Math.random() * 0.7 + 0.3,
+                    direction: Math.random() > 0.5 ? 1 : -1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let star of stars) {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, ' + star.opacity + ')';
+                ctx.fill();
+
+                star.x += star.speed * star.direction;
+
+                if (star.x > width) {
+                    star.x = 0;
+                    star.y = Math.random() * height;
+                } else if (star.x < 0) {
+                    star.x = width;
+                    star.y = Math.random() * height;
+                }
+            }
+
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        // ---------- LESSON COMPLETION ----------
+        function completeLesson() {
+            alert('🎉 Amazing work, mate!\n\nYou\'ve just completed Lesson 3!\n\nYou now know:\n- What an AI-powered website is\n- How to connect to an AI API\n- How to build a chat interface\n- How to generate AI instructions\n\nReady for Lesson 4? 🚀');
+            window.location.href = 'index.html';
+        }
+
+        console.log('🌐 Lesson 3 is ready!');
+    </script>
+
+</body>
+</html>
