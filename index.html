@@ -41,27 +41,81 @@
         }
 
         /* ---------- CLEAN TEXT LOGO ---------- */
-        .logo-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0.6rem 2rem 0.6rem 1.2rem;
-            border-radius: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            width: fit-content;
-            margin: 0 auto 2.5rem auto;
-        }
+        /* ---------- LOGO HEADER CONTAINER ---------- */
+.logo-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.6rem 2rem 0.6rem 1.2rem;
+    border-radius: 60px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    width: fit-content;
+    margin: 0 auto 2.5rem auto;
+}
 
-        .logo-header span {
-            font-weight: 700;
-            font-size: 1.3rem;
-            background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+.logo-header span {
+    font-weight: 700;
+    font-size: 1.3rem;
+    background: linear-gradient(135deg, rgb(167, 139, 250), rgb(96, 165, 250));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ---------- LOGO IMAGE STYLES ---------- */
+
+/* Style 1: Rounded Square (default - use this one!) */
+.logo-img {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+}
+
+/* Style 2: Circle (avatar/profile look) */
+.logo-img-circle {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+}
+
+/* Style 3: Pill Shape (very rounded) */
+.logo-img-pill {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+}
+
+/* Style 4: Square (sharp corners) */
+.logo-img-square {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 0px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+}
+
+/* Style 5: Large Logo (bigger size) */
+.logo-img-large {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 8px;
+}
+}
 
         /* ---------- PAGE TITLE ---------- */
         .page-title {
